@@ -53,6 +53,7 @@ import CourseGenerator from './pages/CourseGenerator';
 import StudentProgressTracker from './pages/StudentProgressTracker';
 import StudentSubmissions from './pages/StudentSubmissions';
 import InstructorGrading from './pages/InstructorGrading';
+import AIContentGenerator from './pages/AIContentGenerator';
 import __Layout from './Layout.jsx';
 
 
@@ -63,6 +64,7 @@ export const PAGES = {
     "StudentProgressTracker": StudentProgressTracker,
     "StudentSubmissions": StudentSubmissions,
     "InstructorGrading": InstructorGrading,
+    "AIContentGenerator": AIContentGenerator,
 }
 
 export const pagesConfig = {
