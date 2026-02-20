@@ -66,9 +66,9 @@ import StudentProgressTracker from './pages/StudentProgressTracker';
 import StudentSubmissions from './pages/StudentSubmissions';
 import StudyAssistant from './pages/StudyAssistant';
 import TalentInsights from './pages/TalentInsights';
+import UserSettings from './pages/UserSettings';
 import WhistleblowerReview from './pages/WhistleblowerReview';
 import WhistleblowerSubmit from './pages/WhistleblowerSubmit';
-import UserSettings from './pages/UserSettings';
 import __Layout from './Layout.jsx';
 
 
@@ -92,9 +92,9 @@ export const PAGES = {
     "StudentSubmissions": StudentSubmissions,
     "StudyAssistant": StudyAssistant,
     "TalentInsights": TalentInsights,
+    "UserSettings": UserSettings,
     "WhistleblowerReview": WhistleblowerReview,
     "WhistleblowerSubmit": WhistleblowerSubmit,
-    "UserSettings": UserSettings,
 }
 
 export const pagesConfig = {

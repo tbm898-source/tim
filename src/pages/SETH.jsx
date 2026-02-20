@@ -86,6 +86,8 @@ export default function SETHPage() {
     }, [messages]);
 
     useEffect(() => {
+        if (typeof window === 'undefined' || !window.speechSynthesis) return;
+        
         const loadVoices = () => {
             const availableVoices = window.speechSynthesis.getVoices();
             if (availableVoices.length > 0) {
@@ -96,11 +98,15 @@ export default function SETHPage() {
         };
         window.speechSynthesis.onvoiceschanged = loadVoices;
         loadVoices();
-        return () => { window.speechSynthesis.onvoiceschanged = null; };
+        return () => { 
+            if (window.speechSynthesis) {
+                window.speechSynthesis.onvoiceschanged = null; 
+            }
+        };
     }, []);
 
     const speak = (text) => {
-        if (!settings.voice || !settings.autoSpeak) return;
+        if (!settings.voice || !settings.autoSpeak || typeof window === 'undefined' || !window.speechSynthesis) return;
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         const selectedVoice = voices.find(v => v.name === settings.voice);
