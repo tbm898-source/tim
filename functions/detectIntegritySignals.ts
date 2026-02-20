@@ -18,17 +18,12 @@ Output JSON Schema:
 {
   "signals": [
     {
-      "signal_type": "financial_anomaly|approval_mismatch|vendor_change|complaint_cluster|time_pattern|access_pattern|policy_deviation",
-      "severity": "low|medium|high|critical",
-      "confidence": "low|medium|high",
-      "pattern_description": "Objective description of what was observed",
-      "policy_reference": "Policy or control that was not followed",
-      "evidence_ids": ["record_id_1", "record_id_2"],
-      "timestamps": ["2026-01-15T14:30:00Z", "2026-01-20T09:15:00Z"],
-      "associated_entities": ["entity_type:entity_id"],
-      "evidence_summary": "Brief summary tying evidence together",
-      "recommended_escalation_level": 0-4,
-      "corroborating_signals": ["signal_id_1", "signal_id_2"]
+      "signal_type": "FIN_APPROVAL_BYPASS|VENDOR_CHANGE_ANOMALY|DATA_EXPORT_SPIKE|INCIDENT_CLUSTER|RETALIATION_RISK",
+      "severity": "low|medium|high",
+      "confidence": 0.0,
+      "pattern_summary": "non-accusatory, 1-2 sentences",
+      "evidence_refs": ["EvidenceItem:id", "MaintenanceTask:id"],
+      "recommended_next_step": "queue_review|request_more_docs|open_case|escalate_external|mandatory_report_route"
     }
   ],
   "analysis_timestamp": "ISO 8601 timestamp",
@@ -105,15 +100,10 @@ Analyze the above data and detect integrity signals. Return JSON only.`,
               properties: {
                 signal_type: { type: "string" },
                 severity: { type: "string" },
-                confidence: { type: "string" },
-                pattern_description: { type: "string" },
-                policy_reference: { type: "string" },
-                evidence_ids: { type: "array", items: { type: "string" } },
-                timestamps: { type: "array", items: { type: "string" } },
-                associated_entities: { type: "array", items: { type: "string" } },
-                evidence_summary: { type: "string" },
-                recommended_escalation_level: { type: "integer" },
-                corroborating_signals: { type: "array", items: { type: "string" } }
+                confidence: { type: "number" },
+                pattern_summary: { type: "string" },
+                evidence_refs: { type: "array", items: { type: "string" } },
+                recommended_next_step: { type: "string" }
               }
             }
           },
@@ -127,19 +117,23 @@ Analyze the above data and detect integrity signals. Return JSON only.`,
     // Create IntegrityAlert records for each detected signal
     const alertsCreated = [];
     for (const signal of llmResponse.signals || []) {
+      const escalationLevel = signal.recommended_next_step === 'mandatory_report_route' ? 4 :
+                              signal.recommended_next_step === 'escalate_external' ? 3 :
+                              signal.recommended_next_step === 'open_case' ? 2 :
+                              signal.recommended_next_step === 'request_more_docs' ? 1 : 0;
+
       const alertData = {
-        alert_type: signal.signal_type,
+        alert_type: signal.signal_type.toLowerCase(),
         severity: signal.severity,
-        escalation_level: signal.recommended_escalation_level || 0,
-        escalation_level_rationale: `Confidence: ${signal.confidence}. ${signal.evidence_summary}`,
-        signal_summary: signal.pattern_description,
+        escalation_level: escalationLevel,
+        escalation_level_rationale: `Confidence: ${signal.confidence.toFixed(2)}. Next step: ${signal.recommended_next_step}`,
+        signal_summary: signal.pattern_summary,
         signal_details: {
-          policy_reference: signal.policy_reference,
-          evidence_ids: signal.evidence_ids,
-          timestamps: signal.timestamps,
-          associated_entities: signal.associated_entities
+          confidence: signal.confidence,
+          evidence_refs: signal.evidence_refs,
+          recommended_next_step: signal.recommended_next_step
         },
-        detection_method: 'AI analysis (narrative-free)',
+        detection_method: 'AI analysis (narrative-free, no motive attribution)',
         detection_timestamp: new Date().toISOString(),
         status: 'new'
       };
