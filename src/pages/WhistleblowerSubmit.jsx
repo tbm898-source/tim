@@ -79,7 +79,12 @@ export default function WhistleblowerSubmit() {
           }).filter(p => p.name) : []
       };
 
-      await base44.entities.WhistleblowerTip.create(tipData);
+      const result = await base44.entities.WhistleblowerTip.create(tipData);
+      
+      // Track tip submission
+      const correlationId = generateCorrelationId();
+      await trackWhistleblowerTipReceived(result, correlationId);
+      
       setSubmittedTipId(tip_id);
       setStep(3);
     } catch (error) {

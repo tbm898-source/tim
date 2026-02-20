@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { generateCorrelationId, trackIntegrityAlertStatusChanged, trackIntegrityAlertEscalated } from '../components/utils/analytics';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -55,7 +56,8 @@ export default function IntegrityMonitoring() {
     },
   });
 
-  const handleStatusChange = (alert, newStatus, reason = '') => {
+  const handleStatusChange = async (alert, newStatus, reason = '') => {
+    const correlationId = generateCorrelationId();
     const statusHistory = alert.status_history || [];
     statusHistory.push({
       timestamp: new Date().toISOString(),
@@ -64,6 +66,16 @@ export default function IntegrityMonitoring() {
       changed_by: user.email,
       reason
     });
+
+    // Track status change
+    await trackIntegrityAlertStatusChanged(
+      alert,
+      alert.status,
+      newStatus,
+      user.role,
+      reason || 'manual_ui_change',
+      correlationId
+    );
 
     updateAlertMutation.mutate({
       id: alert.id,
@@ -94,19 +106,34 @@ export default function IntegrityMonitoring() {
     });
   };
 
-  const handleEscalate = (alert, level, notifiedParties) => {
+  const handleEscalate = async (alert, level, notifiedParties) => {
+    const correlationId = generateCorrelationId();
+    const currentLevel = alert.escalation_level || 0;
+    const nextLevel = Math.min(currentLevel + 1, 4);
+    
     const escalationPath = alert.escalation_path || [];
     escalationPath.push({
-      level,
+      level: nextLevel,
       timestamp: new Date().toISOString(),
       notified_parties: notifiedParties
     });
+
+    // Track escalation
+    await trackIntegrityAlertEscalated(
+      alert,
+      currentLevel,
+      nextLevel,
+      `escalated_to_${level}`,
+      notifiedParties.length,
+      correlationId
+    );
 
     handleStatusChange(alert, 'escalated', `Escalated to ${level}`);
     
     updateAlertMutation.mutate({
       id: alert.id,
       updates: {
+        escalation_level: nextLevel,
         escalation_path: escalationPath
       }
     });
