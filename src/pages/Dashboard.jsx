@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Loader2, Sparkles, RefreshCw } from 'lucide-react';
 import ProgressOverview from '../components/dashboard/ProgressOverview';
 import ModuleProgress from '../components/dashboard/ModuleProgress';
 import QuizAnalytics from '../components/dashboard/QuizAnalytics';
@@ -24,13 +24,18 @@ export default function Dashboard() {
     const [studentId, setStudentId] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     useEffect(() => {
         loadDashboardData();
     }, []);
 
-    const loadDashboardData = async () => {
-        setIsLoading(true);
+    const loadDashboardData = async (isRefresh = false) => {
+        if (isRefresh) {
+            setIsRefreshing(true);
+        } else {
+            setIsLoading(true);
+        }
         try {
             const currentUser = await base44.auth.me();
             setUser(currentUser);
@@ -71,8 +76,16 @@ export default function Dashboard() {
         } catch (error) {
             console.error('Error loading dashboard data:', error);
         } finally {
-            setIsLoading(false);
+            if (isRefresh) {
+                setIsRefreshing(false);
+            } else {
+                setIsLoading(false);
+            }
         }
+    };
+
+    const handlePullToRefresh = async () => {
+        await loadDashboardData(true);
     };
 
     const generateAIInsights = async () => {
@@ -178,19 +191,29 @@ Format your response as a structured analysis with clear sections.`;
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 text-white p-6">
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 dark:from-slate-950 dark:via-black dark:to-slate-950 text-white p-6 pb-24 md:pb-6">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-8">
                     <div>
                         <h1 className="text-4xl font-bold text-cyan-300 mb-2">Learning Dashboard</h1>
-                        <p className="text-gray-400">Welcome back, {user?.full_name || user?.email}</p>
+                        <p className="text-gray-400 dark:text-gray-500">Welcome back, {user?.full_name || user?.email}</p>
                     </div>
-                    <Button
-                        onClick={generateAIInsights}
-                        disabled={isGeneratingInsights}
-                        className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
-                    >
+                    <div className="flex gap-2">
+                        <Button
+                            onClick={handlePullToRefresh}
+                            disabled={isRefreshing}
+                            variant="outline"
+                            size="icon"
+                            className="md:hidden border-cyan-500/50 hover:bg-cyan-500/20 select-none"
+                        >
+                            <RefreshCw className={`h-5 w-5 text-cyan-400 ${isRefreshing ? 'animate-spin' : ''}`} />
+                        </Button>
+                        <Button
+                            onClick={generateAIInsights}
+                            disabled={isGeneratingInsights}
+                            className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 select-none"
+                        >
                         {isGeneratingInsights ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -221,8 +244,8 @@ Format your response as a structured analysis with clear sections.`;
 
                 {/* Detailed Analytics Tabs */}
                 <Tabs defaultValue="submissions" className="mt-8">
-                    <TabsList className="bg-gray-900/50 border border-cyan-500/30">
-                        <TabsTrigger value="submissions" className="data-[state=active]:bg-cyan-500/20">
+                    <TabsList className="bg-gray-900/50 dark:bg-slate-900/50 border border-cyan-500/30 select-none">
+                        <TabsTrigger value="submissions" className="data-[state=active]:bg-cyan-500/20 select-none">
                             Submissions
                         </TabsTrigger>
                         <TabsTrigger value="modules" className="data-[state=active]:bg-cyan-500/20">

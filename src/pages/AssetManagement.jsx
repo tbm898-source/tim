@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Search, Plus, Wrench, Package, MapPin, Camera, 
-  AlertTriangle, CheckCircle, Clock, XCircle 
+  AlertTriangle, CheckCircle, Clock, XCircle, RefreshCw
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -19,12 +19,18 @@ export default function AssetManagement() {
   const [parts, setParts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     loadData();
   }, []);
 
-  const loadData = async () => {
+  const loadData = async (isRefresh = false) => {
+    if (isRefresh) {
+      setIsRefreshing(true);
+    } else {
+      setLoading(true);
+    }
     try {
       const [assetsData, locationsData, tasksData, partsData] = await Promise.all([
         base44.entities.Asset.list(),
@@ -39,8 +45,16 @@ export default function AssetManagement() {
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
-      setLoading(false);
+      if (isRefresh) {
+        setIsRefreshing(false);
+      } else {
+        setLoading(false);
+      }
     }
+  };
+
+  const handlePullToRefresh = async () => {
+    await loadData(true);
   };
 
   const getStatusIcon = (status) => {
@@ -90,14 +104,25 @@ export default function AssetManagement() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black dark:from-slate-950 dark:via-slate-900 dark:to-black text-white p-6 pb-24 md:pb-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-            Asset Management
-          </h1>
-          <p className="text-gray-400">Track assets, tools, and maintenance across all AYA sites</p>
+        <div className="mb-8 flex items-start justify-between">
+          <div>
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+              Asset Management
+            </h1>
+            <p className="text-gray-400 dark:text-gray-500">Track assets, tools, and maintenance across all AYA sites</p>
+          </div>
+          <Button
+            onClick={handlePullToRefresh}
+            disabled={isRefreshing}
+            variant="outline"
+            size="icon"
+            className="md:hidden border-cyan-500/50 hover:bg-cyan-500/20 select-none"
+          >
+            <RefreshCw className={`h-5 w-5 text-cyan-400 ${isRefreshing ? 'animate-spin' : ''}`} />
+          </Button>
         </div>
 
         {/* Quick Stats */}
@@ -153,8 +178,8 @@ export default function AssetManagement() {
 
         {/* Main Content */}
         <Tabs defaultValue="assets" className="space-y-6">
-          <TabsList className="bg-gray-800 border border-gray-700">
-            <TabsTrigger value="assets" className="data-[state=active]:bg-cyan-600">
+          <TabsList className="bg-gray-800 dark:bg-slate-800 border border-gray-700 dark:border-slate-700 select-none">
+            <TabsTrigger value="assets" className="data-[state=active]:bg-cyan-600 select-none">
               <Package className="w-4 h-4 mr-2" />
               Assets & Tools
             </TabsTrigger>
@@ -189,7 +214,7 @@ export default function AssetManagement() {
                 />
               </div>
               <Link to={createPageUrl('AssetForm')}>
-                <Button className="bg-cyan-600 hover:bg-cyan-700">
+                <Button className="bg-cyan-600 hover:bg-cyan-700 select-none">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Asset
                 </Button>

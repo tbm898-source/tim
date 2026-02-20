@@ -68,6 +68,7 @@ import StudyAssistant from './pages/StudyAssistant';
 import TalentInsights from './pages/TalentInsights';
 import WhistleblowerReview from './pages/WhistleblowerReview';
 import WhistleblowerSubmit from './pages/WhistleblowerSubmit';
+import UserSettings from './pages/UserSettings';
 import __Layout from './Layout.jsx';
 
 
@@ -93,6 +94,7 @@ export const PAGES = {
     "TalentInsights": TalentInsights,
     "WhistleblowerReview": WhistleblowerReview,
     "WhistleblowerSubmit": WhistleblowerSubmit,
+    "UserSettings": UserSettings,
 }
 
 export const pagesConfig = {
