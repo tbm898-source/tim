@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, AlertCircle, Clock, FileText, Users, ExternalLink } from 'lucide-react';
+import { Shield, AlertCircle, Clock, FileText, Users, ExternalLink, Sparkles, AlertTriangle, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function WhistleblowerReview() {
@@ -313,6 +313,8 @@ export default function WhistleblowerReview() {
               <Tabs defaultValue="details" className="mt-4">
                 <TabsList className="bg-slate-900">
                   <TabsTrigger value="details">Details</TabsTrigger>
+                  <TabsTrigger value="credibility">Credibility</TabsTrigger>
+                  <TabsTrigger value="conflicts">Conflict Check</TabsTrigger>
                   <TabsTrigger value="followup">Follow-Up</TabsTrigger>
                   <TabsTrigger value="actions">Actions</TabsTrigger>
                 </TabsList>
