@@ -1,5 +1,21 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 
+/** Stable stringify for deterministic hashes */
+function stableStringify(value) {
+  if (value === null || typeof value !== "object") return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(stableStringify).join(",")}]`;
+  const keys = Object.keys(value).sort();
+  return `{${keys.map((k) => JSON.stringify(k) + ":" + stableStringify(value[k])).join(",")}}`;
+}
+
+/** SHA-256 hash as hex string */
+async function sha256Hex(input) {
+  const data = new TextEncoder().encode(input);
+  const hashBuf = await crypto.subtle.digest("SHA-256", data);
+  const hashArr = Array.from(new Uint8Array(hashBuf));
+  return hashArr.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
@@ -9,19 +25,21 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
         }
 
-        // Deterministic seed data for pilot testing
-        const integrityAlert = {
+        const db = base44.asServiceRole.entities;
+
+        // 1) IntegrityAlert seed (without id)
+        const integrityAlertPayload = {
             alert_type: "access_pattern",
             severity: "medium",
             escalation_level: 1,
-            escalation_level_rationale: "Pattern matched rule: increased access activity over baseline; requires human review. No intent inferred.",
+            escalation_level_rationale: "Pattern matched: elevated access activity vs baseline; triage required. No intent inferred.",
             associated_users: ["pilot.user001@example.test"],
             status: "new",
             signal_summary: "Access activity deviated from baseline over the last 24 hours (frequency increase and unusual sequence).",
             signal_details: {
                 transaction_ids: [],
                 entity_type: "EvidencePackage",
-                entity_ids: ["EP-PILOT-0001"],
+                entity_ids: [],
                 date_range: {
                     start: "2026-02-19T08:10:00Z",
                     end: "2026-02-20T08:10:00Z"
@@ -29,8 +47,7 @@ Deno.serve(async (req) => {
                 metadata: {
                     baseline_window_days: 14,
                     observed_access_events: 18,
-                    baseline_access_events: 4,
-                    notes: "Objective metrics only. No narrative added."
+                    baseline_access_events: 4
                 }
             },
             corroborating_signals: [],
@@ -45,7 +62,6 @@ Deno.serve(async (req) => {
                 changed_by: "system",
                 reason: "Initial detection and creation"
             }],
-            evidence_hash: "SHA256:9a9e1c1c0d0f0b7a2d3d8d4f1e2c5f6a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e",
             evidence_snapshot: {
                 snapshot_version: "pilot_v1",
                 captured_at: "2026-02-20T08:10:00Z",
@@ -59,7 +75,7 @@ Deno.serve(async (req) => {
                 level_name: "Review Queue",
                 timestamp: "2026-02-20T08:10:00Z",
                 escalated_by: "system",
-                rationale: "Requires human triage for context; no automated action.",
+                rationale: "Human triage required; no automated action.",
                 notified_parties: ["pilot.reviewer@example.test"],
                 access_granted_until: "2026-03-06T00:00:00Z"
             }],
@@ -69,7 +85,21 @@ Deno.serve(async (req) => {
             confidential: true
         };
 
-        const whistleblowerTip = {
+        // Compute evidence_hash
+        const evidenceHash = await sha256Hex(stableStringify({
+            signal_summary: integrityAlertPayload.signal_summary,
+            detection_timestamp: integrityAlertPayload.detection_timestamp,
+            evidence_snapshot: integrityAlertPayload.evidence_snapshot,
+            signal_details: integrityAlertPayload.signal_details,
+        }));
+
+        const createdAlert = await db.IntegrityAlert.create({
+            ...integrityAlertPayload,
+            evidence_hash: `SHA256:${evidenceHash}`,
+        });
+
+        // 2) WhistleblowerTip seed (linked to alert)
+        const tipPayload = {
             tip_id: "TIP-PILOT-0001",
             submission_method: "web_form",
             submission_timestamp: "2026-02-20T08:12:00Z",
@@ -78,7 +108,7 @@ Deno.serve(async (req) => {
             submitter_phone: "",
             category: "safety_violation",
             summary: "Concern about repeated bypass of a documented safety step in a routine process.",
-            detailed_description: "Pilot-safe description: A safety step appears to have been skipped in multiple instances. This report contains no names and requests review of workflow compliance.",
+            detailed_description: "Pilot-safe: compliance concern only; no real names; requests review of workflow adherence.",
             individuals_involved: [{
                 name: "Person A (pseudonym)",
                 role: "staff",
@@ -87,7 +117,7 @@ Deno.serve(async (req) => {
             incident_date: "2026-02-18",
             incident_location: "operations",
             attachments: [],
-            witness_information: "Potential witnesses exist; request reviewer follow standard interview protocol.",
+            witness_information: "Potential witnesses exist; follow standard protocol.",
             status: "new",
             priority: "medium",
             credibility_assessment: {
@@ -114,7 +144,6 @@ Deno.serve(async (req) => {
             conflict_of_interest_flag: false,
             routed_to_external: false,
             external_case_reference: "",
-            related_alert_id: "",
             follow_up_notes: [],
             employee_feedback_requested: false,
             employee_feedback: [],
@@ -128,107 +157,135 @@ Deno.serve(async (req) => {
             anti_retaliation_notice_acknowledged: true
         };
 
-        const evidencePackage = {
-            package_id: "EP-PILOT-0001",
-            alert_id: "IA-PILOT-0001",
-            created_by: "pilot.reviewer@example.test",
-            created_timestamp: "2026-02-20T08:15:00Z",
-            event_timeline: [{
-                timestamp_utc: "2026-02-20T08:10:00Z",
+        const createdTip = await db.WhistleblowerTip.create({
+            ...tipPayload,
+            related_alert_id: createdAlert.id,
+        });
+
+        // 3) EvidencePackage seed (linked to alert)
+        const pkgCreatedTimestamp = "2026-02-20T08:15:00Z";
+        const pkgCreatedBy = "pilot.reviewer@example.test";
+
+        const eventTimeline = [
+            {
+                timestamp_utc: integrityAlertPayload.detection_timestamp,
                 actor_id: "system",
                 entity_type: "IntegrityAlert",
-                entity_id: "IA-PILOT-0001",
+                entity_id: createdAlert.id,
                 action: "created",
-                metadata: {
-                    alert_type: "access_pattern",
-                    severity: "medium"
-                }
-            }, {
-                timestamp_utc: "2026-02-20T08:15:00Z",
-                actor_id: "pilot.reviewer@example.test",
+                metadata: { alert_type: createdAlert.alert_type, severity: createdAlert.severity },
+            },
+            {
+                timestamp_utc: pkgCreatedTimestamp,
+                actor_id: pkgCreatedBy,
                 entity_type: "EvidencePackage",
                 entity_id: "EP-PILOT-0001",
                 action: "generated",
-                metadata: {
-                    purpose: "pilot_forensic_snapshot",
-                    no_external_transfer: true
-                }
-            }],
-            raw_records: [{
-                record_id: "IA-PILOT-0001",
+                metadata: { purpose: "pilot_forensic_snapshot", no_external_transfer: true },
+            },
+        ];
+
+        const rawRecords = [
+            {
+                record_id: createdAlert.id,
                 record_type: "IntegrityAlert",
                 record_data: {
-                    alert_type: "access_pattern",
-                    severity: "medium",
-                    status: "new",
-                    detection_timestamp: "2026-02-20T08:10:00Z"
+                    alert_type: createdAlert.alert_type,
+                    severity: createdAlert.severity,
+                    status: createdAlert.status,
+                    detection_timestamp: createdAlert.detection_timestamp,
                 },
-                record_hash: "SHA256:0f1e2d3c4b5a69788796a5b4c3d2e1f00112233445566778899aabbccddeeff0",
+                record_hash: `SHA256:${await sha256Hex(stableStringify(createdAlert))}`,
                 source_entity: "IntegrityAlert",
-                captured_at: "2026-02-20T08:15:00Z"
-            }],
+                captured_at: pkgCreatedTimestamp,
+            },
+            {
+                record_id: createdTip.id,
+                record_type: "WhistleblowerTip",
+                record_data: {
+                    tip_id: createdTip.tip_id,
+                    category: createdTip.category,
+                    submission_timestamp: createdTip.submission_timestamp,
+                    status: createdTip.status,
+                },
+                record_hash: `SHA256:${await sha256Hex(stableStringify({
+                    tip_id: createdTip.tip_id,
+                    category: createdTip.category,
+                    submission_timestamp: createdTip.submission_timestamp,
+                    status: createdTip.status,
+                }))}`,
+                source_entity: "WhistleblowerTip",
+                captured_at: pkgCreatedTimestamp,
+            },
+        ];
+
+        const manifestHash = await sha256Hex(stableStringify({
+            package_id: "EP-PILOT-0001",
+            alert_id: createdAlert.id,
+            created_timestamp: pkgCreatedTimestamp,
+            event_timeline: eventTimeline,
+            raw_records: rawRecords,
             file_hashes: [],
-            manifest_hash: "SHA256:1111111111111111111111111111111111111111111111111111111111111111",
+        }));
+
+        const createdPackage = await db.EvidencePackage.create({
+            package_id: "EP-PILOT-0001",
+            alert_id: createdAlert.id,
+            created_by: pkgCreatedBy,
+            created_timestamp: pkgCreatedTimestamp,
+            event_timeline: eventTimeline,
+            raw_records: rawRecords,
+            file_hashes: [],
+            manifest_hash: `SHA256:${manifestHash}`,
             source_metadata: {
                 system_name: "Base44",
                 database_name: "pilot_org_001",
-                entities_queried: ["IntegrityAlert"],
-                record_ids: ["IA-PILOT-0001"],
-                queries_used: [{
-                    entity: "IntegrityAlert",
-                    filter: { id: "IA-PILOT-0001" },
-                    timestamp: "2026-02-20T08:15:00Z"
-                }],
-                extraction_timestamp: "2026-02-20T08:15:00Z"
+                entities_queried: ["IntegrityAlert", "WhistleblowerTip"],
+                record_ids: [createdAlert.id, createdTip.id],
+                queries_used: [
+                    { entity: "IntegrityAlert", filter: { id: createdAlert.id }, timestamp: pkgCreatedTimestamp },
+                    { entity: "WhistleblowerTip", filter: { id: createdTip.id }, timestamp: pkgCreatedTimestamp },
+                ],
+                extraction_timestamp: pkgCreatedTimestamp,
             },
             access_log: [{
-                accessed_by: "pilot.reviewer@example.test",
-                access_timestamp: "2026-02-20T08:15:00Z",
+                accessed_by: pkgCreatedBy,
+                access_timestamp: pkgCreatedTimestamp,
                 access_type: "viewed",
                 ip_address: "",
-                reason_for_access: "Pilot evidence package generation and validation"
+                reason_for_access: "Pilot seed generation/validation",
             }],
             chain_of_custody: [],
             package_status: "active",
             sealed_timestamp: "",
             retention_until: "2033-02-20",
-            confidential: true
-        };
+            confidential: true,
+        });
 
-        const talentInsight = {
+        // 4) TalentInsight seed (independent)
+        const talentPayload = {
             employee_email: "pilot.user002@example.test",
             employee_name: "Pilot User 002",
             profile_generated_date: "2026-02-20T08:25:00Z",
             skills_evidence: [{
                 skill_name: "Preventive Maintenance Documentation",
                 evidence_type: "tool_signoff",
-                evidence_link: "mt_002",
+                evidence_link: "pilot_ref:mt_closeout_002",
                 date_achieved: "2026-02-18",
                 verified_by: "pilot.reviewer@example.test"
             }],
-            strength_profile: [{
-                skill: "Reliability",
-                rank: 1,
-                evidence_count: 3,
-                evidence_links: ["mt_002", "prog_002", "sub_002"]
-            }, {
-                skill: "Attention to Detail",
-                rank: 2,
-                evidence_count: 2,
-                evidence_links: ["mt_002", "qc_001"]
-            }, {
-                skill: "Learning Velocity",
-                rank: 3,
-                evidence_count: 2,
-                evidence_links: ["prog_002", "quiz_001"]
-            }],
+            strength_profile: [
+                { skill: "Reliability", rank: 1, evidence_count: 3, evidence_links: ["pilot_ref:a", "pilot_ref:b", "pilot_ref:c"] },
+                { skill: "Attention to Detail", rank: 2, evidence_count: 2, evidence_links: ["pilot_ref:d", "pilot_ref:e"] },
+                { skill: "Learning Velocity", rank: 3, evidence_count: 2, evidence_links: ["pilot_ref:f", "pilot_ref:g"] }
+            ],
             skill_gap_analysis: [{
                 target_skill: "Incident Documentation",
                 current_level: "beginner",
                 target_level: "intermediate",
                 gap_severity: "low",
                 business_justification: "Improves consistency of operational records; reduces rework during reviews.",
-                evidence_of_need: "Occasional missing fields in task closeouts during pilot."
+                evidence_of_need: "Occasional missing fields in closeouts during pilot."
             }],
             learning_path: {
                 path_title: "Operations Documentation Track",
@@ -237,20 +294,20 @@ Deno.serve(async (req) => {
                     milestone_order: 1,
                     milestone_title: "Complete documentation checklist training",
                     target_completion_weeks: 2,
-                    courses_recommended: ["course_001"],
-                    practice_activities: ["Complete 3 maintenance closeouts using checklist"],
+                    courses_recommended: ["pilot_course_001"],
+                    practice_activities: ["Complete 3 closeouts using checklist"],
                     success_criteria: "3 consecutive closeouts with 100% required fields completed"
                 }],
                 stretch_projects: [{
-                    project_title: "Create a one-page SOP draft for maintenance closeout",
+                    project_title: "Draft a one-page SOP for closeouts",
                     skills_applied: ["Incident Documentation", "Process Clarity"],
                     estimated_duration_weeks: 2,
                     support_needed: "Reviewer feedback on first draft"
                 }]
             },
             mentorship_recommendations: [{
-                mentor_profile_needed: "Senior operations staff familiar with documentation standards",
-                mentorship_focus: "High-quality closeouts and evidence-ready notes",
+                mentor_profile_needed: "Senior ops staff familiar with documentation standards",
+                mentorship_focus: "Evidence-ready closeouts",
                 interaction_frequency: "biweekly",
                 duration_months: 2
             }],
@@ -266,7 +323,7 @@ Deno.serve(async (req) => {
                 outcome_documented: "Closed tasks with complete fields and consistent timestamps",
                 date: "2026-02-18",
                 contribution_type: "project_outcome",
-                evidence_link: "mt_002"
+                evidence_link: "pilot_ref:mt_closeout_002"
             }],
             growth_trend: {
                 improvement_areas: [{
@@ -293,33 +350,33 @@ Deno.serve(async (req) => {
             }],
             recognition_suggestions: [{
                 recognition_type: "public_shoutout",
-                reason: "Consistently complete closeouts during pilot window",
-                evidence_basis: "mt_002 + delivery_metrics"
+                reason: "Consistent closeouts during pilot window",
+                evidence_basis: "delivery_metrics + evidence links"
             }],
             succession_bench_candidate: false,
             succession_roles_qualified: [],
             succession_readiness_evidence: [],
             generated_by: "system",
             reviewed_by: "pilot.reviewer@example.test",
-            review_notes: "Pilot validation: evidence links present; no prohibited attributes; development-focused.",
+            review_notes: "Pilot validation: evidence links present; development-focused; no prohibited attributes.",
             visible_to_roles: ["admin", "leadership"]
         };
 
-        // Insert records using service role
-        const alertResult = await base44.asServiceRole.entities.IntegrityAlert.create(integrityAlert);
-        const tipResult = await base44.asServiceRole.entities.WhistleblowerTip.create(whistleblowerTip);
-        const packageResult = await base44.asServiceRole.entities.EvidencePackage.create(evidencePackage);
-        const insightResult = await base44.asServiceRole.entities.TalentInsight.create(talentInsight);
+        const createdTalent = await db.TalentInsight.create(talentPayload);
 
         return Response.json({
             success: true,
             message: "Pilot seed data created successfully",
-            ids: {
-                integrity_alert_id: alertResult.id,
-                whistleblower_tip_id: tipResult.id,
-                evidence_package_id: packageResult.id,
-                talent_insight_id: insightResult.id
-            }
+            created: {
+                integrityAlert_id: createdAlert.id,
+                whistleblowerTip_id: createdTip.id,
+                evidencePackage_id: createdPackage.id,
+                talentInsight_id: createdTalent.id,
+            },
+            custom_refs: {
+                tip_id: createdTip.tip_id,
+                package_id: createdPackage.package_id,
+            },
         });
     } catch (error) {
         return Response.json({ error: error.message }, { status: 500 });
