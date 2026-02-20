@@ -61,6 +61,8 @@ import StudentProgressTracker from './pages/StudentProgressTracker';
 import StudentSubmissions from './pages/StudentSubmissions';
 import StudyAssistant from './pages/StudyAssistant';
 import AssetManagement from './pages/AssetManagement';
+import MaintenanceTaskDetail from './pages/MaintenanceTaskDetail';
+import AssetScanner from './pages/AssetScanner';
 import __Layout from './Layout.jsx';
 
 
@@ -79,6 +81,8 @@ export const PAGES = {
     "StudentSubmissions": StudentSubmissions,
     "StudyAssistant": StudyAssistant,
     "AssetManagement": AssetManagement,
+    "MaintenanceTaskDetail": MaintenanceTaskDetail,
+    "AssetScanner": AssetScanner,
 }
 
 export const pagesConfig = {
