@@ -167,10 +167,27 @@ export default function IntegrityMonitoring() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <Shield className="w-8 h-8 text-cyan-400" />
-            <h1 className="text-3xl font-bold text-white">Integrity Monitoring</h1>
+            <h1 className="text-3xl font-bold text-white">Integrity Monitor</h1>
+            <Badge variant="outline" className="text-slate-400 border-slate-600">Background Analytics</Badge>
           </div>
           <p className="text-slate-400">Pattern-based signals for human review • Privacy-by-design • No automated accusations</p>
         </div>
+
+        {/* Scope Statement */}
+        <Card className="bg-slate-800/50 border-cyan-500/30 mb-6">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Shield className="w-5 h-5 text-cyan-400" />
+              System Scope & Purpose
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-slate-300">
+            <p className="leading-relaxed">
+              Integrity Monitor reviews system activity, approvals, and operational records to identify anomalies and policy mismatches. 
+              Alerts are non-accusatory and are reviewed by humans. The system does not take disciplinary action automatically.
+            </p>
+          </CardContent>
+        </Card>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
