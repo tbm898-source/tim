@@ -50,6 +50,7 @@
 import Dashboard from './pages/Dashboard';
 import SETH from './pages/SETH';
 import CourseGenerator from './pages/CourseGenerator';
+import StudentProgressTracker from './pages/StudentProgressTracker';
 import __Layout from './Layout.jsx';
 
 
@@ -57,6 +58,7 @@ export const PAGES = {
     "Dashboard": Dashboard,
     "SETH": SETH,
     "CourseGenerator": CourseGenerator,
+    "StudentProgressTracker": StudentProgressTracker,
 }
 
 export const pagesConfig = {
