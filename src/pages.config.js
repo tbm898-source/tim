@@ -56,18 +56,18 @@ import Dashboard from './pages/Dashboard';
 import InstructorAnalytics from './pages/InstructorAnalytics';
 import InstructorFeedbackAssistant from './pages/InstructorFeedbackAssistant';
 import InstructorGrading from './pages/InstructorGrading';
+import IntegrityMonitoring from './pages/IntegrityMonitoring';
 import LearningPathwayGenerator from './pages/LearningPathwayGenerator';
 import MaintenanceTaskDetail from './pages/MaintenanceTaskDetail';
 import MyLearningPath from './pages/MyLearningPath';
+import PrivacyNotice from './pages/PrivacyNotice';
 import SETH from './pages/SETH';
 import StudentProgressTracker from './pages/StudentProgressTracker';
 import StudentSubmissions from './pages/StudentSubmissions';
 import StudyAssistant from './pages/StudyAssistant';
-import IntegrityMonitoring from './pages/IntegrityMonitoring';
-import WhistleblowerSubmit from './pages/WhistleblowerSubmit';
-import WhistleblowerReview from './pages/WhistleblowerReview';
 import TalentInsights from './pages/TalentInsights';
-import PrivacyNotice from './pages/PrivacyNotice';
+import WhistleblowerReview from './pages/WhistleblowerReview';
+import WhistleblowerSubmit from './pages/WhistleblowerSubmit';
 import __Layout from './Layout.jsx';
 
 
@@ -81,18 +81,18 @@ export const PAGES = {
     "InstructorAnalytics": InstructorAnalytics,
     "InstructorFeedbackAssistant": InstructorFeedbackAssistant,
     "InstructorGrading": InstructorGrading,
+    "IntegrityMonitoring": IntegrityMonitoring,
     "LearningPathwayGenerator": LearningPathwayGenerator,
     "MaintenanceTaskDetail": MaintenanceTaskDetail,
     "MyLearningPath": MyLearningPath,
+    "PrivacyNotice": PrivacyNotice,
     "SETH": SETH,
     "StudentProgressTracker": StudentProgressTracker,
     "StudentSubmissions": StudentSubmissions,
     "StudyAssistant": StudyAssistant,
-    "IntegrityMonitoring": IntegrityMonitoring,
-    "WhistleblowerSubmit": WhistleblowerSubmit,
-    "WhistleblowerReview": WhistleblowerReview,
     "TalentInsights": TalentInsights,
-    "PrivacyNotice": PrivacyNotice,
+    "WhistleblowerReview": WhistleblowerReview,
+    "WhistleblowerSubmit": WhistleblowerSubmit,
 }
 
 export const pagesConfig = {

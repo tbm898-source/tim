@@ -44,6 +44,13 @@ export default function WhistleblowerReview() {
     enabled: !!user,
   });
 
+  const assessCredibilityMutation = useMutation({
+    mutationFn: (tipId) => base44.functions.invoke('assessTipCredibility', { tip_id: tipId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['whistleblowerTips'] });
+    },
+  });
+
   const updateTipMutation = useMutation({
     mutationFn: ({ id, updates }) => base44.entities.WhistleblowerTip.update(id, updates),
     onSuccess: () => {
@@ -350,6 +357,222 @@ export default function WhistleblowerReview() {
                       <h3 className="text-sm font-semibold text-slate-400 mb-2">Witness Information</h3>
                       <p className="text-white">{selectedTip.witness_information}</p>
                     </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="credibility" className="space-y-4">
+                  <Card className="bg-slate-900/50 border-cyan-500/30">
+                    <CardHeader>
+                      <CardTitle className="text-white flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-cyan-400" />
+                        Credibility Assessment
+                      </CardTitle>
+                      <CardDescription className="text-slate-400">
+                        AI-powered triage for routing and prioritization (not used for discrimination)
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {!selectedTip.credibility_assessment ? (
+                        <div className="text-center py-6">
+                          <p className="text-slate-400 mb-4">No credibility assessment performed yet</p>
+                          <Button
+                            onClick={() => assessCredibilityMutation.mutate(selectedTip.tip_id)}
+                            disabled={assessCredibilityMutation.isPending}
+                            className="bg-cyan-600 hover:bg-cyan-700"
+                          >
+                            {assessCredibilityMutation.isPending ? 'Assessing...' : 'Run Credibility Assessment'}
+                          </Button>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="grid grid-cols-3 gap-4">
+                            <div>
+                              <p className="text-slate-400 text-sm">Overall Score</p>
+                              <p className="text-2xl font-bold text-cyan-400">
+                                {selectedTip.credibility_assessment.overall_score}/100
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-slate-400 text-sm">Specificity</p>
+                              <p className="text-2xl font-bold text-white">
+                                {selectedTip.credibility_assessment.specificity_score}/100
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-slate-400 text-sm">Verifiability</p>
+                              <p className="text-2xl font-bold text-white">
+                                {selectedTip.credibility_assessment.corroboration_potential}/100
+                              </p>
+                            </div>
+                          </div>
+
+                          <div>
+                            <p className="text-slate-400 text-sm mb-2">Consistency Check</p>
+                            <Badge className={
+                              selectedTip.credibility_assessment.consistency_check === 'consistent' 
+                                ? 'bg-green-500/20 text-green-400'
+                                : selectedTip.credibility_assessment.consistency_check === 'minor_inconsistencies'
+                                ? 'bg-yellow-500/20 text-yellow-400'
+                                : 'bg-red-500/20 text-red-400'
+                            }>
+                              {selectedTip.credibility_assessment.consistency_check}
+                            </Badge>
+                          </div>
+
+                          {selectedTip.credibility_assessment.green_flags && selectedTip.credibility_assessment.green_flags.length > 0 && (
+                            <div>
+                              <p className="text-slate-400 text-sm mb-2">Green Flags (Positive Indicators)</p>
+                              <div className="space-y-1">
+                                {selectedTip.credibility_assessment.green_flags.map((flag, idx) => (
+                                  <div key={idx} className="flex items-start gap-2 text-sm text-green-400">
+                                    <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                    <span>{flag}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {selectedTip.credibility_assessment.red_flags && selectedTip.credibility_assessment.red_flags.length > 0 && (
+                            <div>
+                              <p className="text-slate-400 text-sm mb-2">Red Flags (Needs Attention)</p>
+                              <div className="space-y-1">
+                                {selectedTip.credibility_assessment.red_flags.map((flag, idx) => (
+                                  <div key={idx} className="flex items-start gap-2 text-sm text-yellow-400">
+                                    <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                    <span>{flag}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="border-t border-slate-700 pt-4">
+                            <p className="text-slate-400 text-sm mb-2">Assessment Notes</p>
+                            <p className="text-slate-300 text-sm">{selectedTip.credibility_assessment.assessment_notes}</p>
+                            <p className="text-slate-500 text-xs mt-2">
+                              Assessed by {selectedTip.credibility_assessment.assessed_by} on{' '}
+                              {format(new Date(selectedTip.credibility_assessment.assessed_date), 'PPpp')}
+                            </p>
+                          </div>
+                        </>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="conflicts" className="space-y-4">
+                  <Card className="bg-slate-900/50 border-orange-500/30">
+                    <CardHeader>
+                      <CardTitle className="text-white flex items-center gap-2">
+                        <Shield className="w-5 h-5 text-orange-400" />
+                        Conflict of Interest Check
+                      </CardTitle>
+                      <CardDescription className="text-slate-400">
+                        Cross-reference with existing investigations to detect potential retaliation claims
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {selectedTip.conflict_check ? (
+                        <>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <p className="text-slate-400 text-sm mb-1">Submitter Under Investigation?</p>
+                              <Badge className={
+                                selectedTip.conflict_check.submitter_under_investigation
+                                  ? 'bg-red-500/20 text-red-400'
+                                  : 'bg-green-500/20 text-green-400'
+                              }>
+                                {selectedTip.conflict_check.submitter_under_investigation ? 'YES' : 'NO'}
+                              </Badge>
+                            </div>
+                            <div>
+                              <p className="text-slate-400 text-sm mb-1">Potential Retaliation?</p>
+                              <Badge className={
+                                selectedTip.conflict_check.potential_retaliation_claim
+                                  ? 'bg-red-500/20 text-red-400'
+                                  : 'bg-green-500/20 text-green-400'
+                              }>
+                                {selectedTip.conflict_check.potential_retaliation_claim ? 'YES' : 'NO'}
+                              </Badge>
+                            </div>
+                          </div>
+
+                          {selectedTip.conflict_check.related_alerts && selectedTip.conflict_check.related_alerts.length > 0 && (
+                            <div>
+                              <p className="text-slate-400 text-sm mb-2">Related Integrity Alerts</p>
+                              <div className="space-y-2">
+                                {selectedTip.conflict_check.related_alerts.map((alertId, idx) => (
+                                  <Badge key={idx} variant="outline" className="text-slate-300 border-slate-600">
+                                    Alert: {alertId}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {selectedTip.conflict_check.conflict_notes && (
+                            <div className="border-t border-slate-700 pt-4">
+                              <p className="text-slate-400 text-sm mb-2">Conflict Notes</p>
+                              <p className="text-slate-300 text-sm">{selectedTip.conflict_check.conflict_notes}</p>
+                            </div>
+                          )}
+
+                          {selectedTip.conflict_check.potential_retaliation_claim && (
+                            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+                              <p className="text-red-400 text-sm font-semibold flex items-center gap-2">
+                                <AlertTriangle className="w-4 h-4" />
+                                Automatic External Review Required
+                              </p>
+                              <p className="text-slate-300 text-xs mt-2">
+                                This tip must be reviewed by an independent external team to ensure unbiased assessment.
+                              </p>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <p className="text-slate-400 text-center py-6">No conflict check performed yet</p>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {selectedTip.external_review_status !== 'not_required' && (
+                    <Card className="bg-slate-900/50 border-purple-500/30">
+                      <CardHeader>
+                        <CardTitle className="text-white flex items-center gap-2">
+                          <Users className="w-5 h-5 text-purple-400" />
+                          External Review Status
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div>
+                          <p className="text-slate-400 text-sm mb-1">Review Status</p>
+                          <Badge className="bg-purple-500/20 text-purple-400">
+                            {selectedTip.external_review_status}
+                          </Badge>
+                        </div>
+
+                        {selectedTip.external_reviewer_id && (
+                          <div>
+                            <p className="text-slate-400 text-sm mb-1">Assigned Reviewer</p>
+                            <p className="text-slate-300 text-sm">{selectedTip.external_reviewer_id}</p>
+                          </div>
+                        )}
+
+                        {selectedTip.external_review_outcome && (
+                          <div className="border-t border-slate-700 pt-3">
+                            <p className="text-slate-400 text-sm mb-2">Review Outcome</p>
+                            <Badge className="mb-2">
+                              {selectedTip.external_review_outcome.recommendation}
+                            </Badge>
+                            <p className="text-slate-300 text-sm">{selectedTip.external_review_outcome.rationale}</p>
+                            <p className="text-slate-500 text-xs mt-2">
+                              Reviewed on {format(new Date(selectedTip.external_review_outcome.reviewed_date), 'PPpp')}
+                            </p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
                   )}
                 </TabsContent>
 
