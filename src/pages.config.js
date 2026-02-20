@@ -54,6 +54,8 @@ import StudentProgressTracker from './pages/StudentProgressTracker';
 import StudentSubmissions from './pages/StudentSubmissions';
 import InstructorGrading from './pages/InstructorGrading';
 import AIContentGenerator from './pages/AIContentGenerator';
+import LearningPathwayGenerator from './pages/LearningPathwayGenerator';
+import MyLearningPath from './pages/MyLearningPath';
 import __Layout from './Layout.jsx';
 
 
@@ -65,6 +67,8 @@ export const PAGES = {
     "StudentSubmissions": StudentSubmissions,
     "InstructorGrading": InstructorGrading,
     "AIContentGenerator": AIContentGenerator,
+    "LearningPathwayGenerator": LearningPathwayGenerator,
+    "MyLearningPath": MyLearningPath,
 }
 
 export const pagesConfig = {

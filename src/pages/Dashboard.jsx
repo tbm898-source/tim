@@ -9,6 +9,7 @@ import QuizAnalytics from '../components/dashboard/QuizAnalytics';
 import AIRecommendations from '../components/dashboard/AIRecommendations';
 import TimeSpentChart from '../components/dashboard/TimeSpentChart';
 import SubmissionStatus from '../components/dashboard/SubmissionStatus';
+import LearningPathwayWidget from '../components/dashboard/LearningPathwayWidget';
 
 export default function Dashboard() {
     const [user, setUser] = useState(null);
@@ -20,6 +21,7 @@ export default function Dashboard() {
     const [projectSubmissions, setProjectSubmissions] = useState([]);
     const [assignments, setAssignments] = useState([]);
     const [projects, setProjects] = useState([]);
+    const [studentId, setStudentId] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
 
@@ -34,7 +36,8 @@ export default function Dashboard() {
             setUser(currentUser);
 
             const studentData = await base44.entities.Student.filter({ user_email: currentUser.email });
-            const studentId = studentData.length > 0 ? studentData[0].id : null;
+            const studentRecordId = studentData.length > 0 ? studentData[0].id : null;
+            setStudentId(studentRecordId);
 
             const promises = [
                 base44.entities.Course.list(),
@@ -45,10 +48,10 @@ export default function Dashboard() {
                 base44.entities.Project.list()
             ];
 
-            if (studentId) {
+            if (studentRecordId) {
                 promises.push(
-                    base44.entities.AssignmentSubmission.filter({ student_id: studentId }),
-                    base44.entities.ProjectSubmission.filter({ student_id: studentId })
+                    base44.entities.AssignmentSubmission.filter({ student_id: studentRecordId }),
+                    base44.entities.ProjectSubmission.filter({ student_id: studentRecordId })
                 );
             }
 
@@ -61,7 +64,7 @@ export default function Dashboard() {
             setAssignments(results[4]);
             setProjects(results[5]);
             
-            if (studentId) {
+            if (studentRecordId) {
                 setAssignmentSubmissions(results[6] || []);
                 setProjectSubmissions(results[7] || []);
             }
@@ -208,6 +211,13 @@ Format your response as a structured analysis with clear sections.`;
                     modules={modules}
                     userProgress={userProgress}
                 />
+
+                {/* Learning Pathway Widget */}
+                {studentId && (
+                    <div className="mt-6">
+                        <LearningPathwayWidget studentId={studentId} />
+                    </div>
+                )}
 
                 {/* Detailed Analytics Tabs */}
                 <Tabs defaultValue="submissions" className="mt-8">
