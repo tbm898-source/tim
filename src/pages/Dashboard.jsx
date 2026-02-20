@@ -225,8 +225,9 @@ Format your response as a structured analysis with clear sections.`;
                                 Generate AI Insights
                             </>
                         )}
-                    </Button>
-                </div>
+                        </Button>
+                        </div>
+                        </div>
 
                 {/* Progress Overview */}
                 <ProgressOverview 
