@@ -239,6 +239,9 @@ export default function TalentInsights() {
               <Tabs defaultValue="strengths" className="mt-4">
                 <TabsList className="bg-slate-900">
                   <TabsTrigger value="strengths">Strength Profile</TabsTrigger>
+                  <TabsTrigger value="skillgaps">Skill Gaps</TabsTrigger>
+                  <TabsTrigger value="learningpath">Learning Path</TabsTrigger>
+                  <TabsTrigger value="mentorship">Mentorship</TabsTrigger>
                   <TabsTrigger value="opportunities">Opportunities</TabsTrigger>
                   <TabsTrigger value="recognition">Recognition</TabsTrigger>
                   <TabsTrigger value="growth">Growth Trend</TabsTrigger>
@@ -315,6 +318,200 @@ export default function TalentInsights() {
                         </CardContent>
                       </Card>
                     </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="skillgaps" className="space-y-4">
+                  <h3 className="text-lg font-semibold text-white mb-3">Skill Gap Analysis</h3>
+                  {selectedProfile.skill_gap_analysis && selectedProfile.skill_gap_analysis.length > 0 ? (
+                    <div className="space-y-3">
+                      {selectedProfile.skill_gap_analysis.map((gap, idx) => (
+                        <Card key={idx} className="bg-slate-900/50 border-slate-700">
+                          <CardContent className="pt-6">
+                            <div className="flex items-start justify-between mb-3">
+                              <h4 className="text-white font-semibold">{gap.target_skill}</h4>
+                              <Badge className={
+                                gap.gap_severity === 'high' ? 'bg-red-500/20 text-red-400' :
+                                gap.gap_severity === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                                'bg-blue-500/20 text-blue-400'
+                              }>
+                                {gap.gap_severity} priority
+                              </Badge>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 mb-3">
+                              <div>
+                                <p className="text-slate-400 text-xs">Current Level</p>
+                                <p className="text-slate-300 text-sm font-semibold">{gap.current_level || 'Not assessed'}</p>
+                              </div>
+                              <div>
+                                <p className="text-slate-400 text-xs">Target Level</p>
+                                <p className="text-cyan-400 text-sm font-semibold">{gap.target_level}</p>
+                              </div>
+                            </div>
+                            <div className="space-y-2 text-sm">
+                              <div>
+                                <p className="text-slate-400">Business Justification:</p>
+                                <p className="text-slate-300">{gap.business_justification}</p>
+                              </div>
+                              <div>
+                                <p className="text-slate-400">Evidence of Need:</p>
+                                <p className="text-slate-300">{gap.evidence_of_need}</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-slate-400 text-center py-8">No skill gaps identified</p>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="learningpath" className="space-y-4">
+                  <h3 className="text-lg font-semibold text-white mb-3">Personalized Learning Path</h3>
+                  {selectedProfile.learning_path ? (
+                    <div className="space-y-4">
+                      <Card className="bg-slate-900/50 border-cyan-500/30">
+                        <CardContent className="pt-6">
+                          <h4 className="text-white font-semibold text-lg mb-2">{selectedProfile.learning_path.path_title}</h4>
+                          <p className="text-slate-400 text-sm">
+                            Estimated Duration: {selectedProfile.learning_path.estimated_duration_weeks} weeks
+                          </p>
+                        </CardContent>
+                      </Card>
+
+                      {selectedProfile.learning_path.milestones && selectedProfile.learning_path.milestones.length > 0 && (
+                        <div>
+                          <h4 className="text-white font-semibold mb-3">Learning Milestones</h4>
+                          <div className="space-y-3">
+                            {selectedProfile.learning_path.milestones.map((milestone, idx) => (
+                              <Card key={idx} className="bg-slate-900/50 border-slate-700">
+                                <CardContent className="pt-6">
+                                  <div className="flex items-start gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center flex-shrink-0 text-cyan-400 font-bold">
+                                      {milestone.milestone_order}
+                                    </div>
+                                    <div className="flex-1">
+                                      <h5 className="text-white font-semibold mb-1">{milestone.milestone_title}</h5>
+                                      <p className="text-slate-400 text-xs mb-3">
+                                        Target: {milestone.target_completion_weeks} weeks
+                                      </p>
+                                      
+                                      {milestone.courses_recommended && milestone.courses_recommended.length > 0 && (
+                                        <div className="mb-2">
+                                          <p className="text-slate-400 text-xs mb-1">Recommended Courses:</p>
+                                          <div className="flex flex-wrap gap-1">
+                                            {milestone.courses_recommended.map((course, cIdx) => (
+                                              <Badge key={cIdx} variant="outline" className="text-slate-300 border-slate-600 text-xs">
+                                                {course}
+                                              </Badge>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {milestone.practice_activities && milestone.practice_activities.length > 0 && (
+                                        <div className="mb-2">
+                                          <p className="text-slate-400 text-xs mb-1">Practice Activities:</p>
+                                          <ul className="space-y-1">
+                                            {milestone.practice_activities.map((activity, aIdx) => (
+                                              <li key={aIdx} className="text-slate-300 text-xs">• {activity}</li>
+                                            ))}
+                                          </ul>
+                                        </div>
+                                      )}
+
+                                      <div className="pt-2 border-t border-slate-700">
+                                        <p className="text-slate-400 text-xs">Success Criteria:</p>
+                                        <p className="text-slate-300 text-xs">{milestone.success_criteria}</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {selectedProfile.learning_path.stretch_projects && selectedProfile.learning_path.stretch_projects.length > 0 && (
+                        <div>
+                          <h4 className="text-white font-semibold mb-3">Stretch Projects</h4>
+                          <div className="space-y-3">
+                            {selectedProfile.learning_path.stretch_projects.map((project, idx) => (
+                              <Card key={idx} className="bg-slate-900/50 border-green-500/30">
+                                <CardContent className="pt-6">
+                                  <h5 className="text-white font-semibold mb-2">{project.project_title}</h5>
+                                  <p className="text-slate-400 text-xs mb-2">
+                                    Duration: {project.estimated_duration_weeks} weeks
+                                  </p>
+                                  <div className="mb-2">
+                                    <p className="text-slate-400 text-xs mb-1">Skills Applied:</p>
+                                    <div className="flex flex-wrap gap-1">
+                                      {project.skills_applied.map((skill, sIdx) => (
+                                        <Badge key={sIdx} className="bg-green-500/20 text-green-400 text-xs">
+                                          {skill}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <p className="text-slate-400 text-xs">Support Needed:</p>
+                                    <p className="text-slate-300 text-xs">{project.support_needed}</p>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-slate-400 text-center py-8">Learning path not yet generated</p>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="mentorship" className="space-y-4">
+                  <h3 className="text-lg font-semibold text-white mb-3">Mentorship Recommendations</h3>
+                  {selectedProfile.mentorship_recommendations && selectedProfile.mentorship_recommendations.length > 0 ? (
+                    <div className="space-y-3">
+                      {selectedProfile.mentorship_recommendations.map((mentor, idx) => (
+                        <Card key={idx} className="bg-slate-900/50 border-purple-500/30">
+                          <CardContent className="pt-6">
+                            <div className="flex items-start gap-3">
+                              <Users className="w-6 h-6 text-purple-400 flex-shrink-0 mt-1" />
+                              <div className="flex-1">
+                                <h4 className="text-white font-semibold mb-2">Mentor Profile Needed</h4>
+                                <p className="text-slate-300 text-sm mb-3">{mentor.mentor_profile_needed}</p>
+                                
+                                <div className="space-y-2 text-sm">
+                                  <div>
+                                    <p className="text-slate-400 text-xs">Focus Area:</p>
+                                    <p className="text-slate-300">{mentor.mentorship_focus}</p>
+                                  </div>
+                                  <div className="flex gap-4">
+                                    <div>
+                                      <p className="text-slate-400 text-xs">Frequency:</p>
+                                      <Badge variant="outline" className="text-slate-300 border-slate-600">
+                                        {mentor.interaction_frequency}
+                                      </Badge>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400 text-xs">Duration:</p>
+                                      <Badge variant="outline" className="text-slate-300 border-slate-600">
+                                        {mentor.duration_months} months
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-slate-400 text-center py-8">No mentorship recommendations at this time</p>
                   )}
                 </TabsContent>
 
