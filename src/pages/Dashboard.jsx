@@ -8,6 +8,7 @@ import ModuleProgress from '../components/dashboard/ModuleProgress';
 import QuizAnalytics from '../components/dashboard/QuizAnalytics';
 import AIRecommendations from '../components/dashboard/AIRecommendations';
 import TimeSpentChart from '../components/dashboard/TimeSpentChart';
+import SubmissionStatus from '../components/dashboard/SubmissionStatus';
 
 export default function Dashboard() {
     const [user, setUser] = useState(null);
@@ -15,6 +16,10 @@ export default function Dashboard() {
     const [modules, setModules] = useState([]);
     const [userProgress, setUserProgress] = useState([]);
     const [recommendations, setRecommendations] = useState([]);
+    const [assignmentSubmissions, setAssignmentSubmissions] = useState([]);
+    const [projectSubmissions, setProjectSubmissions] = useState([]);
+    const [assignments, setAssignments] = useState([]);
+    const [projects, setProjects] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
 
@@ -28,17 +33,38 @@ export default function Dashboard() {
             const currentUser = await base44.auth.me();
             setUser(currentUser);
 
-            const [coursesData, modulesData, progressData, recommendationsData] = await Promise.all([
+            const studentData = await base44.entities.Student.filter({ user_email: currentUser.email });
+            const studentId = studentData.length > 0 ? studentData[0].id : null;
+
+            const promises = [
                 base44.entities.Course.list(),
                 base44.entities.Module.list(),
                 base44.entities.UserProgress.filter({ user_id: currentUser.email }),
-                base44.entities.Recommendation.filter({ user_id: currentUser.email, status: 'pending' })
-            ]);
+                base44.entities.Recommendation.filter({ user_id: currentUser.email, status: 'pending' }),
+                base44.entities.Assignment.list(),
+                base44.entities.Project.list()
+            ];
 
-            setCourses(coursesData);
-            setModules(modulesData);
-            setUserProgress(progressData);
-            setRecommendations(recommendationsData);
+            if (studentId) {
+                promises.push(
+                    base44.entities.AssignmentSubmission.filter({ student_id: studentId }),
+                    base44.entities.ProjectSubmission.filter({ student_id: studentId })
+                );
+            }
+
+            const results = await Promise.all(promises);
+            
+            setCourses(results[0]);
+            setModules(results[1]);
+            setUserProgress(results[2]);
+            setRecommendations(results[3]);
+            setAssignments(results[4]);
+            setProjects(results[5]);
+            
+            if (studentId) {
+                setAssignmentSubmissions(results[6] || []);
+                setProjectSubmissions(results[7] || []);
+            }
         } catch (error) {
             console.error('Error loading dashboard data:', error);
         } finally {
@@ -184,8 +210,11 @@ Format your response as a structured analysis with clear sections.`;
                 />
 
                 {/* Detailed Analytics Tabs */}
-                <Tabs defaultValue="modules" className="mt-8">
+                <Tabs defaultValue="submissions" className="mt-8">
                     <TabsList className="bg-gray-900/50 border border-cyan-500/30">
+                        <TabsTrigger value="submissions" className="data-[state=active]:bg-cyan-500/20">
+                            Submissions
+                        </TabsTrigger>
                         <TabsTrigger value="modules" className="data-[state=active]:bg-cyan-500/20">
                             Module Progress
                         </TabsTrigger>
@@ -199,6 +228,15 @@ Format your response as a structured analysis with clear sections.`;
                             AI Recommendations
                         </TabsTrigger>
                     </TabsList>
+
+                    <TabsContent value="submissions" className="mt-6">
+                        <SubmissionStatus
+                            assignmentSubmissions={assignmentSubmissions}
+                            projectSubmissions={projectSubmissions}
+                            assignments={assignments}
+                            projects={projects}
+                        />
+                    </TabsContent>
 
                     <TabsContent value="modules" className="mt-6">
                         <ModuleProgress 
