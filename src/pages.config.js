@@ -47,36 +47,38 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
-import Dashboard from './pages/Dashboard';
-import SETH from './pages/SETH';
-import CourseGenerator from './pages/CourseGenerator';
-import StudentProgressTracker from './pages/StudentProgressTracker';
-import StudentSubmissions from './pages/StudentSubmissions';
-import InstructorGrading from './pages/InstructorGrading';
 import AIContentGenerator from './pages/AIContentGenerator';
+import Achievements from './pages/Achievements';
+import CourseGenerator from './pages/CourseGenerator';
+import Dashboard from './pages/Dashboard';
+import InstructorAnalytics from './pages/InstructorAnalytics';
+import InstructorFeedbackAssistant from './pages/InstructorFeedbackAssistant';
+import InstructorGrading from './pages/InstructorGrading';
 import LearningPathwayGenerator from './pages/LearningPathwayGenerator';
 import MyLearningPath from './pages/MyLearningPath';
-import InstructorFeedbackAssistant from './pages/InstructorFeedbackAssistant';
+import SETH from './pages/SETH';
+import StudentProgressTracker from './pages/StudentProgressTracker';
+import StudentSubmissions from './pages/StudentSubmissions';
 import StudyAssistant from './pages/StudyAssistant';
-import Achievements from './pages/Achievements';
-import InstructorAnalytics from './pages/InstructorAnalytics';
+import AssetManagement from './pages/AssetManagement';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Dashboard": Dashboard,
-    "SETH": SETH,
-    "CourseGenerator": CourseGenerator,
-    "StudentProgressTracker": StudentProgressTracker,
-    "StudentSubmissions": StudentSubmissions,
-    "InstructorGrading": InstructorGrading,
     "AIContentGenerator": AIContentGenerator,
+    "Achievements": Achievements,
+    "CourseGenerator": CourseGenerator,
+    "Dashboard": Dashboard,
+    "InstructorAnalytics": InstructorAnalytics,
+    "InstructorFeedbackAssistant": InstructorFeedbackAssistant,
+    "InstructorGrading": InstructorGrading,
     "LearningPathwayGenerator": LearningPathwayGenerator,
     "MyLearningPath": MyLearningPath,
-    "InstructorFeedbackAssistant": InstructorFeedbackAssistant,
+    "SETH": SETH,
+    "StudentProgressTracker": StudentProgressTracker,
+    "StudentSubmissions": StudentSubmissions,
     "StudyAssistant": StudyAssistant,
-    "Achievements": Achievements,
-    "InstructorAnalytics": InstructorAnalytics,
+    "AssetManagement": AssetManagement,
 }
 
 export const pagesConfig = {
