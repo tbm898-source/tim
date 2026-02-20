@@ -49,40 +49,42 @@
  */
 import AIContentGenerator from './pages/AIContentGenerator';
 import Achievements from './pages/Achievements';
+import AssetManagement from './pages/AssetManagement';
+import AssetScanner from './pages/AssetScanner';
 import CourseGenerator from './pages/CourseGenerator';
 import Dashboard from './pages/Dashboard';
 import InstructorAnalytics from './pages/InstructorAnalytics';
 import InstructorFeedbackAssistant from './pages/InstructorFeedbackAssistant';
 import InstructorGrading from './pages/InstructorGrading';
 import LearningPathwayGenerator from './pages/LearningPathwayGenerator';
+import MaintenanceTaskDetail from './pages/MaintenanceTaskDetail';
 import MyLearningPath from './pages/MyLearningPath';
 import SETH from './pages/SETH';
 import StudentProgressTracker from './pages/StudentProgressTracker';
 import StudentSubmissions from './pages/StudentSubmissions';
 import StudyAssistant from './pages/StudyAssistant';
-import AssetManagement from './pages/AssetManagement';
-import MaintenanceTaskDetail from './pages/MaintenanceTaskDetail';
-import AssetScanner from './pages/AssetScanner';
+import IntegrityMonitoring from './pages/IntegrityMonitoring';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "AIContentGenerator": AIContentGenerator,
     "Achievements": Achievements,
+    "AssetManagement": AssetManagement,
+    "AssetScanner": AssetScanner,
     "CourseGenerator": CourseGenerator,
     "Dashboard": Dashboard,
     "InstructorAnalytics": InstructorAnalytics,
     "InstructorFeedbackAssistant": InstructorFeedbackAssistant,
     "InstructorGrading": InstructorGrading,
     "LearningPathwayGenerator": LearningPathwayGenerator,
+    "MaintenanceTaskDetail": MaintenanceTaskDetail,
     "MyLearningPath": MyLearningPath,
     "SETH": SETH,
     "StudentProgressTracker": StudentProgressTracker,
     "StudentSubmissions": StudentSubmissions,
     "StudyAssistant": StudyAssistant,
-    "AssetManagement": AssetManagement,
-    "MaintenanceTaskDetail": MaintenanceTaskDetail,
-    "AssetScanner": AssetScanner,
+    "IntegrityMonitoring": IntegrityMonitoring,
 }
 
 export const pagesConfig = {
