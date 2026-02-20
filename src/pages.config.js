@@ -67,6 +67,7 @@ import IntegrityMonitoring from './pages/IntegrityMonitoring';
 import WhistleblowerSubmit from './pages/WhistleblowerSubmit';
 import WhistleblowerReview from './pages/WhistleblowerReview';
 import TalentInsights from './pages/TalentInsights';
+import PrivacyNotice from './pages/PrivacyNotice';
 import __Layout from './Layout.jsx';
 
 
@@ -91,6 +92,7 @@ export const PAGES = {
     "WhistleblowerSubmit": WhistleblowerSubmit,
     "WhistleblowerReview": WhistleblowerReview,
     "TalentInsights": TalentInsights,
+    "PrivacyNotice": PrivacyNotice,
 }
 
 export const pagesConfig = {
