@@ -2,7 +2,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 
 const TALENT_INSIGHTS_SYSTEM_PROMPT = `You output JSON only. Use documented evidence only (training completions, project outcomes, peer kudos where opt-in). Do not rank humans as "worth." Provide development-oriented suggestions.
 
-Your role: Analyze employee development data and generate evidence-based talent insights for recognition and growth.
+Your role: Analyze employee development data and generate evidence-based talent insights with proactive skill gap analysis and personalized learning paths.
 
 Rules:
 1. Output ONLY valid JSON matching the provided schema
@@ -13,6 +13,10 @@ Rules:
 6. Focus on improvement trajectory, not raw performance comparisons
 7. Succession readiness must cite specific evidence and gaps, never a single score
 8. All recommendations must be actionable and specific
+9. Perform proactive skill gap analysis by comparing current skills against industry standards and organizational needs
+10. Generate sequenced learning paths with clear milestones and timeframes
+11. Suggest mentorship pairings based on complementary skill profiles
+12. Recommend stretch projects that align with career growth aspirations
 
 Output JSON Schema:
 {
@@ -48,6 +52,46 @@ Output JSON Schema:
     ],
     "curve_description": "Narrative of improvement trend"
   },
+  "skill_gap_analysis": [
+    {
+      "target_skill": "Skill needed for growth",
+      "current_level": "none|beginner|intermediate|advanced",
+      "target_level": "intermediate|advanced|expert",
+      "gap_severity": "low|medium|high",
+      "business_justification": "Why this skill matters to the organization",
+      "evidence_of_need": "Cite projects/roles where this skill is required"
+    }
+  ],
+  "learning_path": {
+    "path_title": "Personalized Learning Path Title",
+    "estimated_duration_weeks": 12,
+    "milestones": [
+      {
+        "milestone_order": 1,
+        "milestone_title": "Foundation skills",
+        "target_completion_weeks": 4,
+        "courses_recommended": ["Course 1", "Course 2"],
+        "practice_activities": ["Activity 1", "Activity 2"],
+        "success_criteria": "What competency to demonstrate"
+      }
+    ],
+    "stretch_projects": [
+      {
+        "project_title": "Real-world project title",
+        "skills_applied": ["Skill 1", "Skill 2"],
+        "estimated_duration_weeks": 6,
+        "support_needed": "What resources/mentorship needed"
+      }
+    ]
+  },
+  "mentorship_recommendations": [
+    {
+      "mentor_profile_needed": "Skills/experience the mentor should have",
+      "mentorship_focus": "What to learn from mentor",
+      "interaction_frequency": "weekly|biweekly|monthly",
+      "duration_months": 3
+    }
+  ],
   "recommended_opportunities": [
     {
       "opportunity_type": "training|stretch_project|mentorship_pairing|leadership_track",
@@ -206,6 +250,65 @@ Analyze the above data and generate talent insights. Return JSON only.`,
               curve_description: { type: "string" }
             }
           },
+          skill_gap_analysis: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                target_skill: { type: "string" },
+                current_level: { type: "string" },
+                target_level: { type: "string" },
+                gap_severity: { type: "string" },
+                business_justification: { type: "string" },
+                evidence_of_need: { type: "string" }
+              }
+            }
+          },
+          learning_path: {
+            type: "object",
+            properties: {
+              path_title: { type: "string" },
+              estimated_duration_weeks: { type: "integer" },
+              milestones: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    milestone_order: { type: "integer" },
+                    milestone_title: { type: "string" },
+                    target_completion_weeks: { type: "integer" },
+                    courses_recommended: { type: "array", items: { type: "string" } },
+                    practice_activities: { type: "array", items: { type: "string" } },
+                    success_criteria: { type: "string" }
+                  }
+                }
+              },
+              stretch_projects: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    project_title: { type: "string" },
+                    skills_applied: { type: "array", items: { type: "string" } },
+                    estimated_duration_weeks: { type: "integer" },
+                    support_needed: { type: "string" }
+                  }
+                }
+              }
+            }
+          },
+          mentorship_recommendations: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                mentor_profile_needed: { type: "string" },
+                mentorship_focus: { type: "string" },
+                interaction_frequency: { type: "string" },
+                duration_months: { type: "integer" }
+              }
+            }
+          },
           recommended_opportunities: {
             type: "array",
             items: {
@@ -254,12 +357,15 @@ Analyze the above data and generate talent insights. Return JSON only.`,
       skills_evidence: llmResponse.skills_evidence,
       strength_profile: llmResponse.strength_profile,
       growth_trend: llmResponse.growth_trend,
+      skill_gap_analysis: llmResponse.skill_gap_analysis,
+      learning_path: llmResponse.learning_path,
+      mentorship_recommendations: llmResponse.mentorship_recommendations,
       recommended_opportunities: llmResponse.recommended_opportunities,
       recognition_suggestions: llmResponse.recognition_suggestions,
       succession_bench_candidate: llmResponse.succession_bench_candidate || false,
       succession_roles_qualified: llmResponse.succession_roles_qualified,
       succession_readiness_evidence: llmResponse.succession_readiness_evidence,
-      generated_by: 'AI analysis (evidence-based)',
+      generated_by: 'AI analysis (evidence-based, skill gap + learning path)',
       visible_to_roles: ['admin', 'leadership']
     };
 
@@ -271,6 +377,10 @@ Analyze the above data and generate talent insights. Return JSON only.`,
       employee_email: created.employee_email,
       employee_name: created.employee_name,
       strengths_identified: created.strength_profile?.length || 0,
+      skill_gaps_identified: created.skill_gap_analysis?.length || 0,
+      learning_milestones: created.learning_path?.milestones?.length || 0,
+      stretch_projects: created.learning_path?.stretch_projects?.length || 0,
+      mentorship_recommendations: created.mentorship_recommendations?.length || 0,
       opportunities_suggested: created.recommended_opportunities?.length || 0
     });
 
