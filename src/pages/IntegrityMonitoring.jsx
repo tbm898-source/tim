@@ -192,11 +192,17 @@ export default function IntegrityMonitoring() {
               System Scope & Purpose
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-slate-300">
+          <CardContent className="text-slate-300 space-y-3">
             <p className="leading-relaxed">
               Integrity Monitor reviews system activity, approvals, and operational records to identify anomalies and policy mismatches. 
               Alerts are non-accusatory and are reviewed by humans. The system does not take disciplinary action automatically.
             </p>
+            <div className="border-t border-slate-700 pt-3">
+              <p className="text-sm leading-relaxed">
+                <span className="font-semibold text-cyan-400">Evidence Packages:</span> Evidence Packages contain original records and audit metadata. 
+                The system does not add conclusions; it provides traceable source data for authorized reviewers.
+              </p>
+            </div>
           </CardContent>
         </Card>
 
