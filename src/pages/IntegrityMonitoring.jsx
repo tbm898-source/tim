@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { AlertTriangle, Shield, Eye, CheckCircle2, XCircle, Clock, AlertCircle, FileText, Users, TrendingUp } from 'lucide-react';
+import { AlertTriangle, Shield, Eye, CheckCircle2, XCircle, Clock, AlertCircle, FileText, Users, TrendingUp, Search } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function IntegrityMonitoring() {
@@ -131,6 +131,17 @@ export default function IntegrityMonitoring() {
       critical: 'bg-red-100 text-red-800 border-red-200'
     };
     return colors[severity] || colors.medium;
+  };
+
+  const getEscalationLevelInfo = (level) => {
+    const levels = {
+      0: { name: 'Informational', desc: 'Logged anomaly, no notification', color: 'text-slate-400', icon: FileText },
+      1: { name: 'Review Queue', desc: 'Single signal; low confidence', color: 'text-blue-400', icon: Eye },
+      2: { name: 'Internal Investigation', desc: 'Multiple corroborating signals', color: 'text-yellow-400', icon: Search },
+      3: { name: 'External Review', desc: 'High materiality or systemic risk', color: 'text-orange-400', icon: AlertTriangle },
+      4: { name: 'Governance/Legal/Mandatory', desc: 'Board notification or mandatory reporting', color: 'text-red-400', icon: AlertCircle }
+    };
+    return levels[level] || levels[0];
   };
 
   const getStatusIcon = (status) => {
@@ -332,6 +343,16 @@ export default function IntegrityMonitoring() {
                         <Badge className={getSeverityColor(alert.severity)}>
                           {alert.severity}
                         </Badge>
+                        {alert.escalation_level !== undefined && (() => {
+                          const levelInfo = getEscalationLevelInfo(alert.escalation_level);
+                          const LevelIcon = levelInfo.icon;
+                          return (
+                            <Badge variant="outline" className={`${levelInfo.color} border-slate-600`}>
+                              <LevelIcon className="w-3 h-3 mr-1" />
+                              Level {alert.escalation_level}
+                            </Badge>
+                          );
+                        })()}
                         <Badge variant="outline" className="text-slate-300 border-slate-600">
                           {alert.alert_type.replace(/_/g, ' ')}
                         </Badge>
@@ -386,6 +407,31 @@ export default function IntegrityMonitoring() {
                 </TabsList>
 
                 <TabsContent value="details" className="space-y-4">
+                  {selectedAlert.escalation_level !== undefined && (() => {
+                    const levelInfo = getEscalationLevelInfo(selectedAlert.escalation_level);
+                    const LevelIcon = levelInfo.icon;
+                    return (
+                      <Card className="bg-slate-900/50 border-slate-700">
+                        <CardContent className="pt-6">
+                          <div className="flex items-start gap-3">
+                            <LevelIcon className={`w-6 h-6 ${levelInfo.color} mt-1`} />
+                            <div>
+                              <h3 className={`text-lg font-semibold ${levelInfo.color}`}>
+                                Level {selectedAlert.escalation_level}: {levelInfo.name}
+                              </h3>
+                              <p className="text-slate-400 text-sm mt-1">{levelInfo.desc}</p>
+                              {selectedAlert.escalation_level_rationale && (
+                                <p className="text-slate-300 text-sm mt-2 italic">
+                                  Rationale: {selectedAlert.escalation_level_rationale}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })()}
+
                   <div>
                     <h3 className="text-sm font-semibold text-slate-400 mb-2">Alert Type</h3>
                     <p className="text-white">{selectedAlert.alert_type.replace(/_/g, ' ')}</p>
