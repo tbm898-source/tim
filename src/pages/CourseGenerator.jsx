@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Sparkles, CheckCircle2, BookOpen, Calendar } from 'lucide-react';
+import { Loader2, Sparkles, CheckCircle2, BookOpen, Calendar, ClipboardList, GraduationCap } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function CourseGenerator() {
@@ -26,7 +26,7 @@ export default function CourseGenerator() {
         setGeneratedCourse(null);
 
         try {
-            const prompt = `You are an expert curriculum designer. Create a comprehensive course structure based on the following:
+            const prompt = `You are an expert curriculum designer and instructional developer. Create a comprehensive course structure based on the following:
 
 Course Title: ${courseTitle}
 Total Clock Hours: ${clockHours || 'Not specified'}
@@ -36,9 +36,15 @@ ${curriculumOutline ? `Curriculum Outline: ${curriculumOutline}` : ''}
 Generate a detailed course structure with:
 1. Course description and metadata
 2. Modules (weeks) - each with a title, topics, and module number
-3. Lessons for each module - each with a title, day number, key content/activities, and student deliverables
+3. Lessons for each module - each with:
+   - Title, day number
+   - Key content/activities and student deliverables
+   - Detailed instructor lesson plan with timing, materials needed, teaching strategies, and assessment methods
+4. Quizzes for each module - include 5-10 questions per module that assess understanding of key concepts
+   - Mix of multiple choice and short answer questions
+   - Include correct answers for grading
 
-Structure the course logically, ensuring each module builds upon previous ones. Include practical activities and assessments.`;
+Structure the course logically, ensuring each module builds upon previous ones. Make lesson plans practical and actionable for instructors.`;
 
             const response = await base44.integrations.Core.InvokeLLM({
                 prompt: prompt,
@@ -84,6 +90,57 @@ Structure the course logically, ensuring each module builds upon previous ones. 
                                     student_deliverables: {
                                         type: "array",
                                         items: { type: "string" }
+                                    },
+                                    instructor_plan: {
+                                        type: "object",
+                                        properties: {
+                                            duration_minutes: { type: "integer" },
+                                            materials_needed: {
+                                                type: "array",
+                                                items: { type: "string" }
+                                            },
+                                            teaching_strategies: { type: "string" },
+                                            lesson_structure: {
+                                                type: "array",
+                                                items: {
+                                                    type: "object",
+                                                    properties: {
+                                                        phase: { type: "string" },
+                                                        time_minutes: { type: "integer" },
+                                                        description: { type: "string" }
+                                                    }
+                                                }
+                                            },
+                                            assessment_methods: { type: "string" }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        quizzes: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    module_number: { type: "integer" },
+                                    title: { type: "string" },
+                                    questions: {
+                                        type: "array",
+                                        items: {
+                                            type: "object",
+                                            properties: {
+                                                question_text: { type: "string" },
+                                                answer_type: {
+                                                    type: "string",
+                                                    enum: ["multiple_choice", "short_answer"]
+                                                },
+                                                options: {
+                                                    type: "array",
+                                                    items: { type: "string" }
+                                                },
+                                                correct_answer: { type: "string" }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -130,6 +187,16 @@ Structure the course logically, ensuring each module builds upon previous ones. 
                     title: lesson.title,
                     key_content_activities: lesson.key_content_activities,
                     student_deliverables: lesson.student_deliverables
+                });
+            }
+
+            // Create quizzes
+            for (const quiz of generatedCourse.quizzes) {
+                await base44.entities.Quiz.create({
+                    module_id: moduleMap[quiz.module_number],
+                    week_number: quiz.module_number,
+                    title: quiz.title,
+                    questions: quiz.questions
                 });
             }
 
@@ -256,7 +323,7 @@ Structure the course logically, ensuring each module builds upon previous ones. 
                                             </p>
                                         </div>
 
-                                        <div className="flex gap-4 text-sm">
+                                        <div className="flex gap-4 text-sm flex-wrap">
                                             <div className="flex items-center gap-2 text-gray-400">
                                                 <Calendar className="h-4 w-4" />
                                                 {generatedCourse.course.total_clock_hours} hours
@@ -264,6 +331,14 @@ Structure the course logically, ensuring each module builds upon previous ones. 
                                             <div className="flex items-center gap-2 text-gray-400">
                                                 <BookOpen className="h-4 w-4" />
                                                 {generatedCourse.modules.length} modules
+                                            </div>
+                                            <div className="flex items-center gap-2 text-gray-400">
+                                                <GraduationCap className="h-4 w-4" />
+                                                {generatedCourse.lessons.length} lessons
+                                            </div>
+                                            <div className="flex items-center gap-2 text-purple-400">
+                                                <ClipboardList className="h-4 w-4" />
+                                                {generatedCourse.quizzes?.length || 0} quizzes
                                             </div>
                                         </div>
 
@@ -303,20 +378,82 @@ Structure the course logically, ensuring each module builds upon previous ones. 
                                                 </CardHeader>
                                                 <CardContent>
                                                     <div className="space-y-2">
-                                                        <p className="text-sm font-medium text-cyan-400">
-                                                            {moduleLessons.length} Lessons
-                                                        </p>
+                                                        <div className="flex items-center gap-3 mb-3">
+                                                            <p className="text-sm font-medium text-cyan-400">
+                                                                {moduleLessons.length} Lessons
+                                                            </p>
+                                                            {generatedCourse.quizzes?.find(q => q.module_number === module.module_number) && (
+                                                                <div className="flex items-center gap-1 text-purple-400 text-xs">
+                                                                    <ClipboardList className="h-3 w-3" />
+                                                                    Quiz included
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                         {moduleLessons.map((lesson, lessonIdx) => (
                                                             <div
                                                                 key={lessonIdx}
-                                                                className="pl-4 border-l-2 border-cyan-500/30 py-2"
+                                                                className="pl-4 border-l-2 border-cyan-500/30 py-2 space-y-2"
                                                             >
-                                                                <p className="text-sm text-white font-medium">
-                                                                    Day {lesson.lesson_day}: {lesson.title}
-                                                                </p>
-                                                                <p className="text-xs text-gray-400 mt-1">
-                                                                    {lesson.key_content_activities.join(', ')}
-                                                                </p>
+                                                                <div>
+                                                                    <p className="text-sm text-white font-medium">
+                                                                        Day {lesson.lesson_day}: {lesson.title}
+                                                                    </p>
+                                                                    <p className="text-xs text-gray-400 mt-1">
+                                                                        {lesson.key_content_activities.join(', ')}
+                                                                    </p>
+                                                                </div>
+
+                                                                {lesson.instructor_plan && (
+                                                                    <div className="bg-blue-500/10 border border-blue-500/30 rounded p-2 mt-2">
+                                                                        <div className="flex items-center gap-1 text-blue-400 text-xs mb-1">
+                                                                            <GraduationCap className="h-3 w-3" />
+                                                                            Instructor Plan ({lesson.instructor_plan.duration_minutes} min)
+                                                                        </div>
+                                                                        <p className="text-xs text-gray-300">
+                                                                            {lesson.instructor_plan.teaching_strategies}
+                                                                        </p>
+                                                                        {lesson.instructor_plan.lesson_structure && (
+                                                                            <div className="mt-2 space-y-1">
+                                                                                {lesson.instructor_plan.lesson_structure.map((phase, phaseIdx) => (
+                                                                                    <div key={phaseIdx} className="text-xs text-gray-400">
+                                                                                        • {phase.phase} ({phase.time_minutes}m): {phase.description}
+                                                                                    </div>
+                                                                                ))}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        ))}
+
+                                                        {generatedCourse.quizzes?.filter(q => q.module_number === module.module_number).map((quiz, qIdx) => (
+                                                            <div key={qIdx} className="mt-3 pt-3 border-t border-cyan-500/20">
+                                                                <div className="flex items-center gap-2 mb-2">
+                                                                    <ClipboardList className="h-4 w-4 text-purple-400" />
+                                                                    <p className="text-sm font-medium text-purple-400">{quiz.title}</p>
+                                                                    <span className="text-xs text-gray-500">({quiz.questions.length} questions)</span>
+                                                                </div>
+                                                                <div className="space-y-2">
+                                                                    {quiz.questions.slice(0, 2).map((q, qnIdx) => (
+                                                                        <div key={qnIdx} className="text-xs bg-gray-800/30 p-2 rounded">
+                                                                            <p className="text-gray-300">{qnIdx + 1}. {q.question_text}</p>
+                                                                            {q.answer_type === 'multiple_choice' && q.options && (
+                                                                                <div className="ml-3 mt-1 space-y-0.5">
+                                                                                    {q.options.map((opt, optIdx) => (
+                                                                                        <p key={optIdx} className="text-gray-500">
+                                                                                            {String.fromCharCode(65 + optIdx)}. {opt}
+                                                                                        </p>
+                                                                                    ))}
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    ))}
+                                                                    {quiz.questions.length > 2 && (
+                                                                        <p className="text-xs text-gray-500 text-center">
+                                                                            + {quiz.questions.length - 2} more questions
+                                                                        </p>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         ))}
                                                     </div>
