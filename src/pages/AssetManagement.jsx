@@ -10,7 +10,7 @@ import {
   AlertTriangle, CheckCircle, Clock, XCircle 
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { createPageUrl } from './utils';
+import { createPageUrl } from '@/utils';
 
 export default function AssetManagement() {
   const [assets, setAssets] = useState([]);
