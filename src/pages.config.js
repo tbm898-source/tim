@@ -56,6 +56,10 @@ import InstructorGrading from './pages/InstructorGrading';
 import AIContentGenerator from './pages/AIContentGenerator';
 import LearningPathwayGenerator from './pages/LearningPathwayGenerator';
 import MyLearningPath from './pages/MyLearningPath';
+import InstructorFeedbackAssistant from './pages/InstructorFeedbackAssistant';
+import StudyAssistant from './pages/StudyAssistant';
+import Achievements from './pages/Achievements';
+import InstructorAnalytics from './pages/InstructorAnalytics';
 import __Layout from './Layout.jsx';
 
 
@@ -69,6 +73,10 @@ export const PAGES = {
     "AIContentGenerator": AIContentGenerator,
     "LearningPathwayGenerator": LearningPathwayGenerator,
     "MyLearningPath": MyLearningPath,
+    "InstructorFeedbackAssistant": InstructorFeedbackAssistant,
+    "StudyAssistant": StudyAssistant,
+    "Achievements": Achievements,
+    "InstructorAnalytics": InstructorAnalytics,
 }
 
 export const pagesConfig = {
