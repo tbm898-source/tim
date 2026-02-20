@@ -66,6 +66,7 @@ import StudyAssistant from './pages/StudyAssistant';
 import IntegrityMonitoring from './pages/IntegrityMonitoring';
 import WhistleblowerSubmit from './pages/WhistleblowerSubmit';
 import WhistleblowerReview from './pages/WhistleblowerReview';
+import TalentInsights from './pages/TalentInsights';
 import __Layout from './Layout.jsx';
 
 
@@ -89,6 +90,7 @@ export const PAGES = {
     "IntegrityMonitoring": IntegrityMonitoring,
     "WhistleblowerSubmit": WhistleblowerSubmit,
     "WhistleblowerReview": WhistleblowerReview,
+    "TalentInsights": TalentInsights,
 }
 
 export const pagesConfig = {
