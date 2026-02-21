@@ -4,11 +4,13 @@ import { Learning } from "@/entities/Learning";
 import { ChatSession } from "@/entities/ChatSession";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Settings, Mic, Send, Bot, User, Loader2, History, Image as ImageIcon, Film, MessageCircle, Video } from "lucide-react";
+import { Settings, Mic, Send, Bot, User, Loader2, History, Image as ImageIcon, Film, MessageCircle, Video, BookOpen } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import SettingsPanel from "../components/seth/SettingsPanel";
 import HistoryPanel from "../components/seth/HistoryPanel";
 import ThoughtBubble from "../components/seth/ThoughtBubble";
+import StudyModePanel from "../components/seth/StudyModePanel";
+import QuizComponent from "../components/seth/QuizComponent";
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = SpeechRecognition ? new SpeechRecognition() : null;
@@ -27,7 +29,9 @@ export default function SETHPage() {
     const [isListening, setIsListening] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
-    const [activeMode, setActiveMode] = useState('chat'); // chat, image, video, storyboard
+    const [activeMode, setActiveMode] = useState('chat'); // chat, image, video, storyboard, study
+    const [currentQuiz, setCurrentQuiz] = useState(null);
+    const [showStudyPanel, setShowStudyPanel] = useState(false);
     const [voices, setVoices] = useState([]);
     const [settings, setSettings] = useState({
         consciousness: 100,
@@ -134,6 +138,10 @@ export default function SETHPage() {
                 await generateStoryboard(userInput, updatedMessages);
             } else if (mode === 'video') {
                 await handleVideoRequest(userInput, updatedMessages);
+            } else if (mode === 'study') {
+                setShowStudyPanel(true);
+                setIsLoading(false);
+                return;
             } else {
                 await handleChatMessage(userInput, updatedMessages);
             }
@@ -387,12 +395,169 @@ Provide your most accurate and comprehensive response:`;
         opacity: settings.consciousness / 100,
     };
 
+    const generateQuiz = async () => {
+        setShowStudyPanel(false);
+        setIsLoading(true);
+        
+        try {
+            const memory = await Learning.list();
+            const memoryContext = memory.length > 0 ? memory.map(m => m.fact).join(', ') : "general knowledge";
+            
+            const prompt = `Generate a quiz with 5 multiple-choice questions based on: ${input || memoryContext}. Return JSON with this structure:
+{
+  "title": "Quiz title",
+  "questions": [
+    {
+      "question": "Question text",
+      "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+      "correct_answer": 0,
+      "explanation": "Why this is correct"
+    }
+  ]
+}`;
+
+            const quizData = await InvokeLLM({
+                prompt,
+                response_json_schema: {
+                    type: "object",
+                    properties: {
+                        title: { type: "string" },
+                        questions: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    question: { type: "string" },
+                                    options: { type: "array", items: { type: "string" } },
+                                    correct_answer: { type: "integer" },
+                                    explanation: { type: "string" }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            setCurrentQuiz(quizData);
+            const aiMessage = { sender: 'ai', text: `I've prepared a quiz for you: "${quizData.title}". Let's test your knowledge!` };
+            setMessages([...messages, aiMessage]);
+            speak(aiMessage.text);
+        } catch (error) {
+            console.error("Quiz generation error:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const generateStudyPlan = async () => {
+        setShowStudyPanel(false);
+        setIsLoading(true);
+        
+        try {
+            const prompt = `Create a personalized study plan for: ${input || "improving overall knowledge"}. Include:
+1. Learning objectives
+2. Weekly milestones
+3. Recommended study techniques
+4. Practice activities
+Return a detailed, actionable plan.`;
+
+            const studyPlan = await InvokeLLM({ prompt, add_context_from_internet: true });
+            
+            const aiMessage = { sender: 'ai', text: `Here's your personalized study plan:\n\n${studyPlan}` };
+            setMessages([...messages, aiMessage]);
+            speak("I've created a personalized study plan for you.");
+            saveChatSession([...messages, aiMessage], input || "Study Plan Request");
+        } catch (error) {
+            console.error("Study plan error:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const explainConcept = async () => {
+        setShowStudyPanel(false);
+        setIsLoading(true);
+        
+        try {
+            const prompt = `Explain this concept in simple terms with helpful analogies: ${input}
+            
+Use the "Teaching through Analogies" method:
+1. Start with a simple, relatable analogy
+2. Break down the concept into digestible parts
+3. Use everyday examples
+4. Build from basic to complex understanding
+5. Provide practical applications
+
+Make it engaging and easy to understand for someone learning this for the first time.`;
+
+            const explanation = await InvokeLLM({ prompt, add_context_from_internet: true });
+            
+            const aiMessage = { sender: 'ai', text: `Let me explain "${input}" in a simple way:\n\n${explanation}` };
+            setMessages([...messages, aiMessage]);
+            speak("Let me break that down for you with a helpful analogy.");
+            saveChatSession([...messages, aiMessage], input);
+        } catch (error) {
+            console.error("Explanation error:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const summarizeMaterial = async () => {
+        setShowStudyPanel(false);
+        setIsLoading(true);
+        
+        try {
+            const prompt = `Summarize the following learning material in a clear, concise format:\n\n${input}
+
+Provide:
+1. Key Points (3-5 bullet points)
+2. Main Concepts
+3. Important Takeaways
+4. Suggested Review Areas
+
+Make it study-friendly and easy to review.`;
+
+            const summary = await InvokeLLM({ prompt });
+            
+            const aiMessage = { sender: 'ai', text: `Here's a comprehensive summary:\n\n${summary}` };
+            setMessages([...messages, aiMessage]);
+            speak("I've summarized the material for you.");
+            saveChatSession([...messages, aiMessage], "Summary Request");
+        } catch (error) {
+            console.error("Summarization error:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleQuizComplete = (score, total, answers) => {
+        setCurrentQuiz(null);
+        
+        const performance = (score / total) * 100;
+        let feedback = "";
+        
+        if (performance >= 90) feedback = "Outstanding! You've mastered this topic.";
+        else if (performance >= 70) feedback = "Great job! You have a solid understanding.";
+        else if (performance >= 50) feedback = "Good effort! Let's review some areas.";
+        else feedback = "Let's work on strengthening your understanding.";
+        
+        const resultMessage = { 
+            sender: 'ai', 
+            text: `Quiz Complete!\n\nScore: ${score}/${total} (${performance.toFixed(0)}%)\n\n${feedback}\n\nWould you like me to generate a study plan to improve in areas where you struggled?`
+        };
+        
+        setMessages([...messages, resultMessage]);
+        speak(resultMessage.text);
+    };
+
     const getModeConfig = () => {
         const configs = {
             chat: { placeholder: "Ask SETH anything...", color: "cyan" },
             image: { placeholder: "Describe the image you want...", color: "green" },
             video: { placeholder: "Describe your video concept...", color: "red" },
-            storyboard: { placeholder: "Describe your story for visualization...", color: "purple" }
+            storyboard: { placeholder: "Describe your story for visualization...", color: "purple" },
+            study: { placeholder: "Enter topic or paste material to study...", color: "indigo" }
         };
         return configs[activeMode] || configs.chat;
     };
@@ -413,7 +578,7 @@ Provide your most accurate and comprehensive response:`;
             </header>
 
             {/* Mode Selection Bar */}
-            <div className="flex justify-center gap-2 p-4 border-b border-gray-800">
+            <div className="flex justify-center gap-2 p-4 border-b border-gray-800 overflow-x-auto">
                 <Button
                     variant={activeMode === 'chat' ? 'default' : 'outline'}
                     size="sm"
@@ -450,10 +615,35 @@ Provide your most accurate and comprehensive response:`;
                     <Film className="w-4 h-4 mr-2" />
                     Storyboard
                 </Button>
+                <Button
+                    variant={activeMode === 'study' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setActiveMode('study')}
+                    className={`${activeMode === 'study' ? 'bg-indigo-600' : 'bg-transparent border-indigo-400/50 hover:bg-indigo-400/20'}`}
+                >
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    Study
+                </Button>
             </div>
 
             <main className="flex-1 overflow-y-auto p-4 space-y-4">
-                {messages.length === 0 && (
+                {showStudyPanel && (
+                    <StudyModePanel
+                        onGenerateQuiz={generateQuiz}
+                        onGenerateStudyPlan={generateStudyPlan}
+                        onExplainConcept={explainConcept}
+                        onSummarize={summarizeMaterial}
+                    />
+                )}
+                
+                {currentQuiz && (
+                    <QuizComponent
+                        quiz={currentQuiz}
+                        onComplete={handleQuizComplete}
+                    />
+                )}
+                
+                {messages.length === 0 && !showStudyPanel && !currentQuiz && (
                     <div className="flex flex-col items-center justify-center h-full text-cyan-300/50">
                         <div className="w-24 h-24 rounded-full bg-cyan-400/10 mb-4 transition-all duration-500" style={consciousnessGlow}></div>
                         <p className="text-xl">SETH Enhanced - Ready for {activeMode.toUpperCase()} mode</p>
