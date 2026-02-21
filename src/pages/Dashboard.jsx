@@ -10,6 +10,8 @@ import AIRecommendations from '../components/dashboard/AIRecommendations';
 import TimeSpentChart from '../components/dashboard/TimeSpentChart';
 import SubmissionStatus from '../components/dashboard/SubmissionStatus';
 import LearningPathwayWidget from '../components/dashboard/LearningPathwayWidget';
+import PullToRefresh from 'react-pull-to-refresh';
+import PageTransition from '../components/PageTransition';
 
 export default function Dashboard() {
     const [user, setUser] = useState(null);
@@ -191,8 +193,10 @@ Format your response as a structured analysis with clear sections.`;
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 dark:from-slate-950 dark:via-black dark:to-slate-950 text-white p-6 pb-24 md:pb-6">
-            <div className="max-w-7xl mx-auto">
+        <PageTransition>
+            <PullToRefresh onRefresh={handlePullToRefresh} className="pull-to-refresh-wrapper">
+                <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 dark:from-slate-950 dark:via-black dark:to-slate-950 text-white p-6 pb-24 md:pb-6">
+                    <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-8">
                     <div>

@@ -4,8 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { base44 } from '@/api/base44Client';
 import { Sparkles, AlertTriangle, Target, BookOpen, X, Check } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
 
 export default function AIRecommendations({ recommendations, modules, onRecommendationUpdate }) {
+    // Optimistic mutation for recommendation status updates
+    const updateRecommendationMutation = useMutation({
+        mutationFn: ({ id, status }) => base44.entities.Recommendation.update(id, { status }),
+        onSuccess: () => {
+            onRecommendationUpdate();
+        },
+    });
+
     const getPriorityIcon = (priority) => {
         switch (priority) {
             case 'critical': return <AlertTriangle className="h-5 w-5 text-red-400" />;
@@ -24,13 +33,8 @@ export default function AIRecommendations({ recommendations, modules, onRecommen
         }
     };
 
-    const handleUpdateStatus = async (recommendationId, newStatus) => {
-        try {
-            await base44.entities.Recommendation.update(recommendationId, { status: newStatus });
-            onRecommendationUpdate();
-        } catch (error) {
-            console.error('Error updating recommendation:', error);
-        }
+    const handleUpdateStatus = (recommendationId, newStatus) => {
+        updateRecommendationMutation.mutate({ id: recommendationId, status: newStatus });
     };
 
     if (recommendations.length === 0) {
