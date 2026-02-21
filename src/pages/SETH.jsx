@@ -570,7 +570,7 @@ Make it study-friendly and easy to review.`;
                         <History className="h-6 w-6 text-cyan-400" />
                     </Button>
                     <div className="w-10 h-10 rounded-full bg-cyan-400 transition-all duration-500" style={consciousnessGlow}></div>
-                    <h1 className="text-2xl font-bold tracking-wider text-cyan-300">SETH</h1>
+                    <h1 className="text-2xl font-bold tracking-wider text-cyan-300">TIM</h1>
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => setShowSettings(true)}>
                     <Settings className="h-6 w-6 text-cyan-400 hover:animate-spin" />
@@ -698,7 +698,7 @@ Make it study-friendly and easy to review.`;
                         <Mic className={`w-5 h-5 ${isListening ? 'text-red-500' : 'text-cyan-400'}`} />
                     </Button>
 
-                    <Input
+remember
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder={isListening ? "Listening..." : getModeConfig().placeholder}
