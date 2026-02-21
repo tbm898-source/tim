@@ -422,8 +422,9 @@ export default function MaintenanceTaskDetail() {
           >
             Back
           </Button>
-          </div>
         </div>
-      </PageTransition>
-    );
-  }
+        </div>
+      </div>
+    </PageTransition>
+  );
+}
