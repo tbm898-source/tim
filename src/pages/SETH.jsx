@@ -698,7 +698,7 @@ Make it study-friendly and easy to review.`;
                         <Mic className={`w-5 h-5 ${isListening ? 'text-red-500' : 'text-cyan-400'}`} />
                     </Button>
 
-remember
+                    <Input
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder={isListening ? "Listening..." : getModeConfig().placeholder}
