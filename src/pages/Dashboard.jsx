@@ -302,7 +302,9 @@ Format your response as a structured analysis with clear sections.`;
                         />
                     </TabsContent>
                 </Tabs>
-            </div>
-        </div>
+                    </div>
+                </div>
+            </PullToRefresh>
+        </PageTransition>
     );
 }

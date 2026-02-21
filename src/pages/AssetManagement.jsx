@@ -14,6 +14,9 @@ import { createPageUrl } from '@/utils';
 import AssetDetailModal from '../components/asset/AssetDetailModal';
 import PartsInventoryManager from '../components/asset/PartsInventoryManager';
 import CameraSystemManager from '../components/asset/CameraSystemManager';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import PullToRefresh from 'react-pull-to-refresh';
+import PageTransition from '../components/PageTransition';
 
 export default function AssetManagement() {
   const [assets, setAssets] = useState([]);
@@ -25,6 +28,22 @@ export default function AssetManagement() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [showAssetDetail, setShowAssetDetail] = useState(false);
+  const queryClient = useQueryClient();
+
+  // Optimistic mutation for asset status updates
+  const updateAssetMutation = useMutation({
+    mutationFn: ({ assetId, updates }) => base44.entities.Asset.update(assetId, updates),
+    onMutate: async ({ assetId, updates }) => {
+      // Optimistically update the UI
+      setAssets(prev => prev.map(asset => 
+        asset.id === assetId ? { ...asset, ...updates } : asset
+      ));
+    },
+    onError: (error, variables) => {
+      // Revert on error
+      loadData();
+    },
+  });
 
   useEffect(() => {
     loadData();
@@ -59,7 +78,9 @@ export default function AssetManagement() {
   };
 
   const handlePullToRefresh = async () => {
+    setIsRefreshing(true);
     await loadData(true);
+    return Promise.resolve();
   };
 
   const getStatusIcon = (status) => {
@@ -109,8 +130,10 @@ export default function AssetManagement() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black dark:from-slate-950 dark:via-slate-900 dark:to-black text-white p-6 pb-24 md:pb-6">
-      <div className="max-w-7xl mx-auto">
+    <PageTransition>
+      <PullToRefresh onRefresh={handlePullToRefresh} className="pull-to-refresh-wrapper">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black dark:from-slate-950 dark:via-slate-900 dark:to-black text-white p-6 pb-24 md:pb-6">
+          <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8 flex items-start justify-between">
           <div>
@@ -351,16 +374,18 @@ export default function AssetManagement() {
             <CameraSystemManager />
           </TabsContent>
         </Tabs>
-      </div>
+          </div>
 
-      <AssetDetailModal
-        asset={selectedAsset}
-        isOpen={showAssetDetail}
-        onClose={() => {
-          setShowAssetDetail(false);
-          setSelectedAsset(null);
-        }}
-      />
-    </div>
+          <AssetDetailModal
+            asset={selectedAsset}
+            isOpen={showAssetDetail}
+            onClose={() => {
+              setShowAssetDetail(false);
+              setSelectedAsset(null);
+            }}
+          />
+        </div>
+      </PullToRefresh>
+    </PageTransition>
   );
 }

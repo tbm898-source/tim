@@ -8,6 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Upload, X, Camera, Video, Package, Plus, Trash2, Save, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import MobileHeader from '../components/MobileHeader';
+import PageTransition from '../components/PageTransition';
 
 export default function MaintenanceTaskDetail() {
   const navigate = useNavigate();
@@ -20,11 +23,25 @@ export default function MaintenanceTaskDetail() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const queryClient = useQueryClient();
 
   const [newPart, setNewPart] = useState({
     part_id: '',
     quantity: 1,
     cost: 0
+  });
+
+  // Optimistic mutation for task updates
+  const updateTaskMutation = useMutation({
+    mutationFn: ({ taskId, updates }) => base44.entities.MaintenanceTask.update(taskId, updates),
+    onMutate: async ({ updates }) => {
+      // Optimistically update the task
+      setTask(prev => ({ ...prev, ...updates }));
+    },
+    onError: () => {
+      // Reload on error
+      loadData();
+    },
   });
 
   useEffect(() => {
@@ -126,8 +143,7 @@ export default function MaintenanceTaskDetail() {
   const updateTask = async (updates) => {
     setSaving(true);
     try {
-      await base44.entities.MaintenanceTask.update(taskId, updates);
-      setTask({ ...task, ...updates });
+      await updateTaskMutation.mutateAsync({ taskId, updates });
     } catch (error) {
       console.error('Error updating task:', error);
       alert('Failed to update task');
@@ -163,8 +179,10 @@ export default function MaintenanceTaskDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white p-6">
-      <div className="max-w-4xl mx-auto">
+    <PageTransition>
+      <MobileHeader title={task?.title} />
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white p-6 pb-24 md:pb-6">
+        <div className="max-w-4xl mx-auto">
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2 text-cyan-400">{task.title}</h1>
           <p className="text-gray-400">{asset?.name} - {asset?.asset_tag}</p>
@@ -404,8 +422,8 @@ export default function MaintenanceTaskDetail() {
           >
             Back
           </Button>
+          </div>
         </div>
-      </div>
-    </div>
-  );
-}
+      </PageTransition>
+    );
+  }
