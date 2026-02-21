@@ -11,6 +11,9 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import AssetDetailModal from '../components/asset/AssetDetailModal';
+import PartsInventoryManager from '../components/asset/PartsInventoryManager';
+import CameraSystemManager from '../components/asset/CameraSystemManager';
 
 export default function AssetManagement() {
   const [assets, setAssets] = useState([]);
@@ -20,6 +23,8 @@ export default function AssetManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [selectedAsset, setSelectedAsset] = useState(null);
+  const [showAssetDetail, setShowAssetDetail] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -249,11 +254,17 @@ export default function AssetManagement() {
                         Next maintenance: {new Date(asset.next_maintenance_due).toLocaleDateString()}
                       </p>
                     )}
-                    <Link to={createPageUrl('AssetDetails') + '?id=' + asset.id}>
-                      <Button variant="outline" size="sm" className="w-full mt-2 border-gray-600 text-white hover:bg-gray-700">
-                        View Details
-                      </Button>
-                    </Link>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full mt-2 border-gray-600 text-white hover:bg-gray-700"
+                      onClick={() => {
+                        setSelectedAsset(asset);
+                        setShowAssetDetail(true);
+                      }}
+                    >
+                      View Details
+                    </Button>
                   </CardContent>
                 </Card>
               ))}
@@ -305,33 +316,7 @@ export default function AssetManagement() {
 
           {/* Parts Tab */}
           <TabsContent value="parts">
-            <Link to={createPageUrl('PartsInventory')}>
-              <Button className="bg-cyan-600 hover:bg-cyan-700 mb-4">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Part
-              </Button>
-            </Link>
-            {lowStockParts.length > 0 && (
-              <Card className="bg-red-900/20 border-red-500 mb-4">
-                <CardHeader>
-                  <CardTitle className="text-red-400 flex items-center">
-                    <AlertTriangle className="w-5 h-5 mr-2" />
-                    Low Stock Alert
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-300">{lowStockParts.length} parts need reordering</p>
-                </CardContent>
-              </Card>
-            )}
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white">Parts Inventory</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-400">Full inventory management coming soon</p>
-              </CardContent>
-            </Card>
+            <PartsInventoryManager parts={parts} onUpdate={loadData} />
           </TabsContent>
 
           {/* Locations Tab */}
@@ -363,23 +348,19 @@ export default function AssetManagement() {
 
           {/* Cameras Tab */}
           <TabsContent value="cameras">
-            <Link to={createPageUrl('CameraManagement')}>
-              <Button className="bg-cyan-600 hover:bg-cyan-700 mb-4">
-                <Plus className="w-4 h-4 mr-2" />
-                Register Camera
-              </Button>
-            </Link>
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white">Camera Systems</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-400">Camera management with privacy compliance tracking</p>
-              </CardContent>
-            </Card>
+            <CameraSystemManager />
           </TabsContent>
         </Tabs>
       </div>
+
+      <AssetDetailModal
+        asset={selectedAsset}
+        isOpen={showAssetDetail}
+        onClose={() => {
+          setShowAssetDetail(false);
+          setSelectedAsset(null);
+        }}
+      />
     </div>
   );
 }
