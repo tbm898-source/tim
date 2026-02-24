@@ -69,6 +69,7 @@ import TalentInsights from './pages/TalentInsights';
 import UserSettings from './pages/UserSettings';
 import WhistleblowerReview from './pages/WhistleblowerReview';
 import WhistleblowerSubmit from './pages/WhistleblowerSubmit';
+import AdminSeedPilotData from './pages/AdminSeedPilotData';
 import __Layout from './Layout.jsx';
 
 
@@ -95,6 +96,7 @@ export const PAGES = {
     "UserSettings": UserSettings,
     "WhistleblowerReview": WhistleblowerReview,
     "WhistleblowerSubmit": WhistleblowerSubmit,
+    "AdminSeedPilotData": AdminSeedPilotData,
 }
 
 export const pagesConfig = {
