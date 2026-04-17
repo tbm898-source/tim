@@ -100,7 +100,7 @@ export const PAGES = {
 }
 
 export const pagesConfig = {
-    mainPage: "IntegrityMonitoring",
+    mainPage: "SETH",
     Pages: PAGES,
     Layout: __Layout,
 };
