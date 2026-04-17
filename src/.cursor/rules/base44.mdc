@@ -1,0 +1,57 @@
+---
+description: Base44 platform rules for this app — apply to all edits
+alwaysApply: true
+---
+
+# Base44 App Rules
+
+## Stack
+- React 18 + Vite + Tailwind CSS + shadcn/ui (in `src/components/ui/`)
+- Lucide React for icons (only import icons you know exist)
+- Backend: Deno Deploy functions in `functions/` — each is a standalone HTTP handler
+- DB: `base44.entities.*` SDK (no raw SQL, no REST calls to internal DB)
+- Auth: `base44.auth.me()` returns current user `{ id, email, full_name, role }`
+
+## File Structure Rules
+- New page → `src/pages/MyPage.jsx` + add `<Route>` in `src/App.jsx` manually
+- New component → `src/components/domain/ComponentName.jsx` (keep files < 150 lines)
+- New backend function → `functions/myFunction.js`
+- Entity schemas → `entities/EntityName.json` (always write full schema, no placeholders)
+
+## Backend Function Template
+```js
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+Deno.serve(async (req) => {
+  const base44 = createClientFromRequest(req);
+  const user = await base44.auth.me();
+  if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  // ... logic ...
+  return Response.json({ ok: true });
+});
+```
+- No local imports between function files
+- Admin-only: check `user.role !== 'admin'` → return 403
+- Connector token: `const { accessToken } = await base44.asServiceRole.connectors.getConnection("clickup")`
+- Frontend call: `await base44.functions.invoke('functionName', payload)`
+
+## Frontend Rules
+- Never construct Tailwind class names dynamically (no template literals for classes)
+- Use design tokens: `bg-background`, `text-foreground`, `text-muted-foreground`, etc.
+- Entity CRUD: `base44.entities.EntityName.list/filter/create/update/delete/bulkCreate`
+- Use `@tanstack/react-query` for data fetching
+- Mobile-first, responsive layouts always
+
+## Entities (key fields)
+- `MaintenanceTask`: has `clickup_task_id`, `asset_id`, `status`, `priority`, `assigned_to`
+- `Asset`: has `clickup_task_id`, `status`, `condition`, `next_maintenance_due`
+- `IntegrityAlert`: `alert_type`, `severity`, `escalation_level`, `evidence_hash`
+- `WhistleblowerTip`: `tip_id`, `category`, `status`, `related_alert_id`
+- `EvidencePackage`: `package_id`, `alert_id`, `manifest_hash`
+- `TalentInsight`: `employee_email`, `skills_evidence`, `learning_path`
+
+## Do NOT
+- Use `createPageUrl` — use React Router `<Link to="/path">` with literal paths
+- Add `id`, `created_date`, `updated_date`, `created_by` to entity schemas (auto-generated)
+- Install packages not in the approved list
+- Use `try/catch` unless explicitly required
+- Import from `deno.land/x` — use `npm:` prefix
