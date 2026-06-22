@@ -1,0 +1,46 @@
+{
+  "name": "Student",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user account linked to this student"
+    },
+    "student_id": {
+      "type": "string",
+      "description": "Unique student identification number"
+    },
+    "full_name": {
+      "type": "string",
+      "description": "Full name of the student"
+    },
+    "enrollment_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date when student first enrolled"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive",
+        "graduated",
+        "withdrawn"
+      ],
+      "default": "active",
+      "description": "Current student status"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "Contact email for the student"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Student phone number"
+    }
+  },
+  "required": [
+    "user_email",
+    "full_name"
+  ]
+}

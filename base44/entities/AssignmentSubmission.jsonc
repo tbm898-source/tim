@@ -1,0 +1,89 @@
+{
+  "name": "AssignmentSubmission",
+  "type": "object",
+  "properties": {
+    "assignment_id": {
+      "type": "string",
+      "description": "ID of the assignment"
+    },
+    "student_id": {
+      "type": "string",
+      "description": "ID of the student"
+    },
+    "enrollment_id": {
+      "type": "string",
+      "description": "ID of the enrollment"
+    },
+    "submission_text": {
+      "type": "string",
+      "description": "Text content of the submission"
+    },
+    "file_urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "URLs of uploaded files"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "submitted",
+        "graded",
+        "needs_revision",
+        "resubmitted"
+      ],
+      "default": "draft",
+      "description": "Submission status"
+    },
+    "submitted_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date when submitted"
+    },
+    "graded_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date when graded"
+    },
+    "grade": {
+      "type": "number",
+      "description": "Grade received (out of rubric total)"
+    },
+    "rubric_scores": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "criterion_name": {
+            "type": "string"
+          },
+          "points_earned": {
+            "type": "number"
+          },
+          "points_possible": {
+            "type": "number"
+          },
+          "feedback": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Detailed rubric scoring"
+    },
+    "instructor_feedback": {
+      "type": "string",
+      "description": "Overall instructor feedback"
+    },
+    "graded_by": {
+      "type": "string",
+      "description": "Email of instructor who graded"
+    }
+  },
+  "required": [
+    "assignment_id",
+    "student_id",
+    "enrollment_id"
+  ]
+}

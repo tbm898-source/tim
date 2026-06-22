@@ -1,0 +1,13 @@
+{
+  "name": "Learning",
+  "type": "object",
+  "properties": {
+    "fact": {
+      "type": "string",
+      "description": "A concise piece of information or preference learned by the AI."
+    }
+  },
+  "required": [
+    "fact"
+  ]
+}

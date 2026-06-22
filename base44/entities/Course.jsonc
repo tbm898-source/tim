@@ -1,0 +1,38 @@
+{
+  "name": "Course",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Course title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Course description"
+    },
+    "total_clock_hours": {
+      "type": "integer",
+      "description": "Total clock hours for the course"
+    },
+    "estimated_completion_time_months": {
+      "type": "integer",
+      "description": "Estimated time to complete in months"
+    },
+    "pre_apprenticeship_supplemental_content_hours": {
+      "type": "integer",
+      "description": "Pre-apprenticeship supplemental content hours"
+    },
+    "terms_included": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of terms included in the course"
+    }
+  },
+  "required": [
+    "title",
+    "description",
+    "total_clock_hours"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "name": "Quiz",
+  "type": "object",
+  "properties": {
+    "module_id": {
+      "type": "string",
+      "description": "ID of the parent module"
+    },
+    "week_number": {
+      "type": "integer",
+      "description": "Week number for this quiz"
+    },
+    "title": {
+      "type": "string",
+      "description": "Quiz title"
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "question_text": {
+            "type": "string"
+          },
+          "answer_type": {
+            "type": "string",
+            "enum": [
+              "short_answer",
+              "multiple_choice"
+            ]
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "correct_answer": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Array of quiz questions"
+    }
+  },
+  "required": [
+    "module_id",
+    "title"
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "name": "PeerReview",
+  "type": "object",
+  "properties": {
+    "assignment_id": {
+      "type": "string",
+      "description": "ID of the assignment being peer reviewed"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "ID of the project being peer reviewed"
+    },
+    "title": {
+      "type": "string",
+      "description": "Peer review framework title"
+    },
+    "instructions": {
+      "type": "string",
+      "description": "Instructions for reviewers"
+    },
+    "review_criteria": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "criterion": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "rating_scale": {
+            "type": "string"
+          },
+          "guiding_questions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "Criteria for peer evaluation"
+    },
+    "constructive_feedback_guidelines": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Guidelines for providing constructive feedback"
+    },
+    "minimum_reviews_required": {
+      "type": "integer",
+      "description": "Minimum number of peer reviews required",
+      "default": 2
+    },
+    "reflection_prompts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Prompts for students to reflect on peer feedback"
+    }
+  },
+  "required": [
+    "title",
+    "instructions",
+    "review_criteria"
+  ]
+}

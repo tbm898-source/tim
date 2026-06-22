@@ -1,0 +1,242 @@
+{
+  "name": "EvidencePackage",
+  "type": "object",
+  "properties": {
+    "package_id": {
+      "type": "string",
+      "description": "Unique evidence package identifier"
+    },
+    "alert_id": {
+      "type": "string",
+      "description": "Associated IntegrityAlert ID"
+    },
+    "created_by": {
+      "type": "string",
+      "description": "Email of person who generated the package"
+    },
+    "created_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp when package was created"
+    },
+    "event_timeline": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "timestamp_utc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "actor_id": {
+            "type": "string"
+          },
+          "entity_type": {
+            "type": "string"
+          },
+          "entity_id": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object"
+          }
+        }
+      },
+      "description": "Chronological event timeline with UTC timestamps"
+    },
+    "raw_records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "record_id": {
+            "type": "string"
+          },
+          "record_type": {
+            "type": "string"
+          },
+          "record_data": {
+            "type": "object"
+          },
+          "record_hash": {
+            "type": "string"
+          },
+          "source_entity": {
+            "type": "string"
+          },
+          "captured_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "description": "Immutable snapshots of original records"
+    },
+    "file_hashes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string"
+          },
+          "hash_algorithm": {
+            "type": "string",
+            "enum": [
+              "SHA256",
+              "SHA512"
+            ]
+          },
+          "hash_value": {
+            "type": "string"
+          },
+          "file_size_bytes": {
+            "type": "integer"
+          }
+        }
+      },
+      "description": "Hash of each file/record in the package"
+    },
+    "manifest_hash": {
+      "type": "string",
+      "description": "Hash of entire package manifest for integrity verification"
+    },
+    "source_metadata": {
+      "type": "object",
+      "properties": {
+        "system_name": {
+          "type": "string"
+        },
+        "database_name": {
+          "type": "string"
+        },
+        "entities_queried": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "record_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "queries_used": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "entity": {
+                "type": "string"
+              },
+              "filter": {
+                "type": "object"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        },
+        "extraction_timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Provenance: where and how data was extracted"
+    },
+    "access_log": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "accessed_by": {
+            "type": "string"
+          },
+          "access_timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "access_type": {
+            "type": "string",
+            "enum": [
+              "viewed",
+              "exported",
+              "downloaded",
+              "shared"
+            ]
+          },
+          "ip_address": {
+            "type": "string"
+          },
+          "reason_for_access": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Immutable log of who accessed this evidence package"
+    },
+    "chain_of_custody": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "transferred_from": {
+            "type": "string"
+          },
+          "transferred_to": {
+            "type": "string"
+          },
+          "transfer_method": {
+            "type": "string"
+          },
+          "acknowledgment_signature": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Chain of custody for external transfers"
+    },
+    "package_status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "sealed",
+        "archived",
+        "transferred_external"
+      ],
+      "default": "active",
+      "description": "Status of the evidence package"
+    },
+    "sealed_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp when package was sealed (immutable)"
+    },
+    "retention_until": {
+      "type": "string",
+      "format": "date",
+      "description": "Date until which package must be retained"
+    },
+    "confidential": {
+      "type": "boolean",
+      "default": true,
+      "description": "Highly sensitive evidence package"
+    }
+  },
+  "required": [
+    "package_id",
+    "created_timestamp",
+    "event_timeline",
+    "manifest_hash"
+  ]
+}

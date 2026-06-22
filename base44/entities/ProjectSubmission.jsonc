@@ -1,0 +1,124 @@
+{
+  "name": "ProjectSubmission",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "description": "ID of the project"
+    },
+    "student_id": {
+      "type": "string",
+      "description": "ID of the student"
+    },
+    "enrollment_id": {
+      "type": "string",
+      "description": "ID of the enrollment"
+    },
+    "phase_submissions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "phase_name": {
+            "type": "string"
+          },
+          "submission_text": {
+            "type": "string"
+          },
+          "file_urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "submitted_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "not_started",
+              "in_progress",
+              "submitted",
+              "approved",
+              "needs_revision"
+            ]
+          }
+        }
+      },
+      "description": "Submissions for each project phase"
+    },
+    "final_submission_text": {
+      "type": "string",
+      "description": "Final project submission text"
+    },
+    "final_file_urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Final project files"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "not_started",
+        "in_progress",
+        "submitted",
+        "graded",
+        "needs_revision"
+      ],
+      "default": "not_started",
+      "description": "Overall project status"
+    },
+    "submitted_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Final submission date"
+    },
+    "graded_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date when graded"
+    },
+    "grade": {
+      "type": "number",
+      "description": "Final grade"
+    },
+    "rubric_scores": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "points_earned": {
+            "type": "number"
+          },
+          "points_possible": {
+            "type": "number"
+          },
+          "feedback": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Rubric category scores"
+    },
+    "instructor_feedback": {
+      "type": "string",
+      "description": "Overall feedback"
+    },
+    "graded_by": {
+      "type": "string",
+      "description": "Email of grader"
+    }
+  },
+  "required": [
+    "project_id",
+    "student_id",
+    "enrollment_id"
+  ]
+}

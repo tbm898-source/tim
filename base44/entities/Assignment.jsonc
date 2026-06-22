@@ -1,0 +1,83 @@
+{
+  "name": "Assignment",
+  "type": "object",
+  "properties": {
+    "module_id": {
+      "type": "string",
+      "description": "ID of the parent module"
+    },
+    "course_id": {
+      "type": "string",
+      "description": "ID of the parent course"
+    },
+    "title": {
+      "type": "string",
+      "description": "Assignment title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed assignment description"
+    },
+    "learning_objectives": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Specific learning objectives this assignment addresses"
+    },
+    "instructions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Step-by-step instructions for students"
+    },
+    "deliverables": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Expected deliverables"
+    },
+    "rubric": {
+      "type": "object",
+      "properties": {
+        "criteria": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "points": {
+                "type": "integer"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "total_points": {
+          "type": "integer"
+        }
+      },
+      "description": "Grading rubric"
+    },
+    "estimated_hours": {
+      "type": "integer",
+      "description": "Estimated hours to complete"
+    },
+    "due_after_days": {
+      "type": "integer",
+      "description": "Days after module start when assignment is due"
+    }
+  },
+  "required": [
+    "module_id",
+    "title",
+    "description",
+    "learning_objectives"
+  ]
+}

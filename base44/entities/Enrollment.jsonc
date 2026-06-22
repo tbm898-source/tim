@@ -1,0 +1,50 @@
+{
+  "name": "Enrollment",
+  "type": "object",
+  "properties": {
+    "student_id": {
+      "type": "string",
+      "description": "ID of the student entity"
+    },
+    "course_id": {
+      "type": "string",
+      "description": "ID of the course"
+    },
+    "enrollment_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time of enrollment"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "enrolled",
+        "in_progress",
+        "completed",
+        "withdrawn",
+        "on_hold"
+      ],
+      "default": "enrolled",
+      "description": "Enrollment status"
+    },
+    "completion_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date when the course was completed"
+    },
+    "expected_completion_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Expected completion date"
+    },
+    "final_grade": {
+      "type": "number",
+      "description": "Final grade as a percentage (0-100)"
+    }
+  },
+  "required": [
+    "student_id",
+    "course_id",
+    "enrollment_date"
+  ]
+}

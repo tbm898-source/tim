@@ -1,0 +1,37 @@
+{
+  "name": "Lesson",
+  "type": "object",
+  "properties": {
+    "module_id": {
+      "type": "string",
+      "description": "ID of the parent module"
+    },
+    "lesson_day": {
+      "type": "integer",
+      "description": "Day number within the module"
+    },
+    "title": {
+      "type": "string",
+      "description": "Lesson title"
+    },
+    "key_content_activities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Key content and activities for this lesson"
+    },
+    "student_deliverables": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Expected student deliverables"
+    }
+  },
+  "required": [
+    "module_id",
+    "lesson_day",
+    "title"
+  ]
+}

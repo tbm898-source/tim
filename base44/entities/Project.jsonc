@@ -1,0 +1,107 @@
+{
+  "name": "Project",
+  "type": "object",
+  "properties": {
+    "course_id": {
+      "type": "string",
+      "description": "ID of the parent course"
+    },
+    "module_id": {
+      "type": "string",
+      "description": "ID of the module (if module-specific)"
+    },
+    "title": {
+      "type": "string",
+      "description": "Project title"
+    },
+    "overview": {
+      "type": "string",
+      "description": "Project overview and purpose"
+    },
+    "learning_objectives": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Learning objectives addressed by this project"
+    },
+    "scope": {
+      "type": "string",
+      "description": "Project scope and requirements"
+    },
+    "phases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "phase_name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "deliverables": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "estimated_hours": {
+            "type": "integer"
+          }
+        }
+      },
+      "description": "Project phases and milestones"
+    },
+    "final_deliverables": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Final project deliverables"
+    },
+    "rubric": {
+      "type": "object",
+      "properties": {
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "category": {
+                "type": "string"
+              },
+              "weight_percentage": {
+                "type": "integer"
+              },
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "total_points": {
+          "type": "integer"
+        }
+      },
+      "description": "Comprehensive grading rubric"
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Required resources and tools"
+    }
+  },
+  "required": [
+    "course_id",
+    "title",
+    "overview",
+    "learning_objectives",
+    "final_deliverables"
+  ]
+}

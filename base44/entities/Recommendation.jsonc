@@ -1,0 +1,56 @@
+{
+  "name": "Recommendation",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "ID of the user"
+    },
+    "recommended_content_id": {
+      "type": "string",
+      "description": "ID of the recommended content"
+    },
+    "recommended_content_type": {
+      "type": "string",
+      "enum": [
+        "lesson",
+        "module",
+        "quiz",
+        "external_resource"
+      ],
+      "description": "Type of recommended content"
+    },
+    "reason": {
+      "type": "string",
+      "description": "AI-generated reason for this recommendation"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium",
+      "description": "Priority level of this recommendation"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "viewed",
+        "completed",
+        "dismissed"
+      ],
+      "default": "pending",
+      "description": "Status of the recommendation"
+    }
+  },
+  "required": [
+    "user_id",
+    "recommended_content_id",
+    "recommended_content_type",
+    "reason"
+  ]
+}

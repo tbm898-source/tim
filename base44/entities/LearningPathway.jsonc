@@ -1,0 +1,141 @@
+{
+  "name": "LearningPathway",
+  "type": "object",
+  "properties": {
+    "student_id": {
+      "type": "string",
+      "description": "ID of the student"
+    },
+    "enrollment_id": {
+      "type": "string",
+      "description": "ID of the enrollment"
+    },
+    "pathway_title": {
+      "type": "string",
+      "description": "Title of the personalized learning pathway"
+    },
+    "analysis_summary": {
+      "type": "string",
+      "description": "AI-generated analysis of student performance"
+    },
+    "identified_gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          },
+          "evidence": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Identified learning gaps"
+    },
+    "recommended_content": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "content_type": {
+            "type": "string",
+            "enum": [
+              "module",
+              "lesson",
+              "quiz",
+              "assignment",
+              "external_resource"
+            ]
+          },
+          "content_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "integer"
+          },
+          "estimated_time_hours": {
+            "type": "number"
+          }
+        }
+      },
+      "description": "Sequenced learning recommendations"
+    },
+    "strengths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Student's identified strengths"
+    },
+    "next_milestones": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "milestone": {
+            "type": "string"
+          },
+          "target_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "success_criteria": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Learning milestones and goals"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "completed",
+        "needs_update"
+      ],
+      "default": "active",
+      "description": "Pathway status"
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the pathway was last regenerated"
+    },
+    "performance_metrics": {
+      "type": "object",
+      "properties": {
+        "avg_quiz_score": {
+          "type": "number"
+        },
+        "completion_rate": {
+          "type": "number"
+        },
+        "avg_assignment_grade": {
+          "type": "number"
+        },
+        "time_on_task_hours": {
+          "type": "number"
+        }
+      },
+      "description": "Current performance snapshot"
+    }
+  },
+  "required": [
+    "student_id",
+    "enrollment_id",
+    "pathway_title"
+  ]
+}

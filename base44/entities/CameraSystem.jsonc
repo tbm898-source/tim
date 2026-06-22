@@ -1,0 +1,80 @@
+{
+  "name": "CameraSystem",
+  "type": "object",
+  "properties": {
+    "camera_id": {
+      "type": "string",
+      "description": "Unique camera identifier"
+    },
+    "location_id": {
+      "type": "string",
+      "description": "Location where camera is installed"
+    },
+    "location_description": {
+      "type": "string",
+      "description": "Detailed location description"
+    },
+    "camera_type": {
+      "type": "string",
+      "enum": [
+        "security",
+        "monitoring",
+        "classroom",
+        "facility"
+      ],
+      "description": "Type of camera"
+    },
+    "privacy_level": {
+      "type": "string",
+      "enum": [
+        "public",
+        "restricted",
+        "private",
+        "hipaa_compliant"
+      ],
+      "description": "Privacy classification"
+    },
+    "access_policy": {
+      "type": "string",
+      "description": "Who can access footage"
+    },
+    "retention_days": {
+      "type": "integer",
+      "description": "Days to retain footage"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive",
+        "maintenance"
+      ],
+      "default": "active",
+      "description": "Camera status"
+    },
+    "installed_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Installation date"
+    },
+    "last_maintenance": {
+      "type": "string",
+      "format": "date",
+      "description": "Last maintenance date"
+    },
+    "consent_signage": {
+      "type": "boolean",
+      "default": false,
+      "description": "Is consent signage posted?"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes and compliance info"
+    }
+  },
+  "required": [
+    "camera_id",
+    "location_id",
+    "privacy_level"
+  ]
+}

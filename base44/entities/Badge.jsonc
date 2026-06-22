@@ -1,0 +1,47 @@
+{
+  "name": "Badge",
+  "type": "object",
+  "properties": {
+    "student_id": {
+      "type": "string",
+      "description": "ID of the student who earned the badge"
+    },
+    "badge_type": {
+      "type": "string",
+      "enum": [
+        "first_lesson",
+        "quiz_master",
+        "perfect_score",
+        "week_streak",
+        "assignment_ace",
+        "project_champion",
+        "fast_learner",
+        "dedicated_student",
+        "improvement_star"
+      ],
+      "description": "Type of achievement"
+    },
+    "title": {
+      "type": "string",
+      "description": "Badge title"
+    },
+    "description": {
+      "type": "string",
+      "description": "What the badge represents"
+    },
+    "earned_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the badge was earned"
+    },
+    "icon_color": {
+      "type": "string",
+      "description": "Color code for badge display"
+    }
+  },
+  "required": [
+    "student_id",
+    "badge_type",
+    "title"
+  ]
+}

@@ -4,7 +4,7 @@ import { Learning } from "@/entities/Learning";
 import { ChatSession } from "@/entities/ChatSession";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Settings, Mic, Send, Bot, User, Loader2, History, Image as ImageIcon, Film, MessageCircle, Video, BookOpen, CheckSquare } from "lucide-react";
+import { Settings, Mic, Send, Bot, User, Loader2, History, Image as ImageIcon, Film, MessageCircle, Video, BookOpen, CheckSquare, LayoutDashboard } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import SettingsPanel from "../components/seth/SettingsPanel";
 import HistoryPanel from "../components/seth/HistoryPanel";
@@ -12,6 +12,7 @@ import ThoughtBubble from "../components/seth/ThoughtBubble";
 import StudyModePanel from "../components/seth/StudyModePanel";
 import QuizComponent from "../components/seth/QuizComponent";
 import TaskListPanel from "../components/seth/TaskListPanel";
+import StudentProgressDashboard from "../components/seth/StudentProgressDashboard";
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = SpeechRecognition ? new SpeechRecognition() : null;
@@ -30,7 +31,7 @@ export default function SETHPage() {
     const [isListening, setIsListening] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
-    const [activeMode, setActiveMode] = useState('chat'); // chat, image, video, storyboard, study, tasks
+    const [activeMode, setActiveMode] = useState('dashboard'); // chat, image, video, storyboard, study, tasks, dashboard
     const [currentQuiz, setCurrentQuiz] = useState(null);
     const [showStudyPanel, setShowStudyPanel] = useState(false);
     const [voices, setVoices] = useState([]);
@@ -559,7 +560,8 @@ Make it study-friendly and easy to review.`;
             video: { placeholder: "Describe your video concept...", color: "red" },
             storyboard: { placeholder: "Describe your story for visualization...", color: "purple" },
             study: { placeholder: "Enter topic or paste material to study...", color: "indigo" },
-            tasks: { placeholder: "Ask about your tasks...", color: "teal" }
+            tasks: { placeholder: "Ask about your tasks...", color: "teal" },
+            dashboard: { placeholder: "Ask about student progress...", color: "violet" }
         };
         return configs[activeMode] || configs.chat;
     };
@@ -635,12 +637,30 @@ Make it study-friendly and easy to review.`;
                     <CheckSquare className="w-4 h-4 mr-2" />
                     Tasks
                 </Button>
+                <Button
+                    variant={activeMode === 'dashboard' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setActiveMode('dashboard')}
+                    className={`${activeMode === 'dashboard' ? 'bg-violet-600' : 'bg-transparent border-violet-400/50 hover:bg-violet-400/20'}`}
+                >
+                    <LayoutDashboard className="w-4 h-4 mr-2" />
+                    Progress
+                </Button>
             </div>
 
             <main className="flex-1 overflow-y-auto p-4 space-y-4">
                 {activeMode === 'tasks' && (
                     <div className="p-4 rounded-xl bg-gray-900/50 border border-teal-500/30">
                         <TaskListPanel />
+                    </div>
+                )}
+
+                {activeMode === 'dashboard' && (
+                    <div className="p-4 rounded-xl bg-gray-900/50 border border-violet-500/30">
+                        <h2 className="text-violet-300 text-lg font-semibold mb-4 flex items-center gap-2">
+                            <LayoutDashboard className="w-5 h-5" /> Student Progress Dashboard
+                        </h2>
+                        <StudentProgressDashboard />
                     </div>
                 )}
 

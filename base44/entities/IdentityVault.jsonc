@@ -1,0 +1,69 @@
+{
+  "name": "IdentityVault",
+  "type": "object",
+  "properties": {
+    "subject_token": {
+      "type": "string",
+      "description": "UUID token - the only link between identity and analytics planes"
+    },
+    "encrypted_identifiers": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "full_name": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        }
+      },
+      "description": "Encrypted PII - only accessible to authorized roles"
+    },
+    "contact_methods_optional": {
+      "type": "object",
+      "properties": {
+        "preferred_contact": {
+          "type": "string",
+          "enum": [
+            "email",
+            "phone",
+            "mail",
+            "none"
+          ]
+        },
+        "emergency_contact": {
+          "type": "string"
+        }
+      },
+      "description": "Optional contact preferences"
+    },
+    "source_entity_type": {
+      "type": "string",
+      "description": "Original entity type (Student, User, etc.)"
+    },
+    "source_entity_id": {
+      "type": "string",
+      "description": "Original entity ID for reference"
+    },
+    "last_accessed": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last time identity was accessed"
+    },
+    "access_count": {
+      "type": "integer",
+      "default": 0,
+      "description": "Number of times identity was accessed"
+    }
+  },
+  "required": [
+    "subject_token",
+    "encrypted_identifiers",
+    "source_entity_type"
+  ]
+}

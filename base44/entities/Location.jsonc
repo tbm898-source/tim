@@ -1,0 +1,60 @@
+{
+  "name": "Location",
+  "type": "object",
+  "properties": {
+    "site_name": {
+      "type": "string",
+      "description": "Name of the site/location"
+    },
+    "site_code": {
+      "type": "string",
+      "description": "Unique site code"
+    },
+    "address": {
+      "type": "string",
+      "description": "Physical address"
+    },
+    "city": {
+      "type": "string",
+      "description": "City"
+    },
+    "state": {
+      "type": "string",
+      "description": "State"
+    },
+    "zip_code": {
+      "type": "string",
+      "description": "ZIP code"
+    },
+    "site_manager": {
+      "type": "string",
+      "description": "Email of site manager"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Contact phone"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "classroom",
+        "workshop",
+        "office",
+        "storage",
+        "outdoor",
+        "vehicle",
+        "other"
+      ],
+      "description": "Location type"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Is this location active?"
+    }
+  },
+  "required": [
+    "site_name",
+    "site_code"
+  ]
+}

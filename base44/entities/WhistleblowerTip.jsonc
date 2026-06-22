@@ -1,0 +1,353 @@
+{
+  "name": "WhistleblowerTip",
+  "type": "object",
+  "properties": {
+    "tip_id": {
+      "type": "string",
+      "description": "Unique tip identifier (shown to submitter for follow-up)"
+    },
+    "submission_method": {
+      "type": "string",
+      "enum": [
+        "web_form",
+        "email",
+        "phone",
+        "mail"
+      ],
+      "description": "How the tip was submitted"
+    },
+    "submission_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp of submission"
+    },
+    "anonymous": {
+      "type": "boolean",
+      "default": true,
+      "description": "Is this tip anonymous?"
+    },
+    "submitter_email": {
+      "type": "string",
+      "description": "Optional: submitter email if not anonymous"
+    },
+    "submitter_phone": {
+      "type": "string",
+      "description": "Optional: submitter phone if not anonymous"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "financial_misconduct",
+        "fraud",
+        "theft",
+        "safety_violation",
+        "harassment",
+        "discrimination",
+        "retaliation",
+        "conflict_of_interest",
+        "policy_violation",
+        "other"
+      ],
+      "description": "Category of concern"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Brief summary of the concern"
+    },
+    "detailed_description": {
+      "type": "string",
+      "description": "Detailed description of the incident/concern"
+    },
+    "individuals_involved": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "department": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "People allegedly involved (structured, no free narrative)"
+    },
+    "incident_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of incident (if known)"
+    },
+    "incident_location": {
+      "type": "string",
+      "description": "Location/department where incident occurred"
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "File URLs of supporting documentation"
+    },
+    "witness_information": {
+      "type": "string",
+      "description": "Information about potential witnesses"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "credibility_review",
+        "external_review",
+        "under_review",
+        "investigating",
+        "resolved",
+        "closed",
+        "insufficient_evidence"
+      ],
+      "default": "new",
+      "description": "Current tip status"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "urgent"
+      ],
+      "default": "medium",
+      "description": "Priority level"
+    },
+    "credibility_assessment": {
+      "type": "object",
+      "properties": {
+        "overall_score": {
+          "type": "number",
+          "description": "0-100 credibility score (NOT used for discrimination, only triage)"
+        },
+        "specificity_score": {
+          "type": "number",
+          "description": "How specific are the details provided?"
+        },
+        "corroboration_potential": {
+          "type": "number",
+          "description": "Is there potential for verification?"
+        },
+        "consistency_check": {
+          "type": "string",
+          "enum": [
+            "consistent",
+            "minor_inconsistencies",
+            "major_inconsistencies"
+          ]
+        },
+        "red_flags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Potential concerns (e.g., vague claims, no specifics, contradictory timeline)"
+        },
+        "green_flags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Positive indicators (e.g., specific dates, named witnesses, documentary evidence)"
+        },
+        "assessment_notes": {
+          "type": "string"
+        },
+        "assessed_by": {
+          "type": "string",
+          "description": "System or reviewer who performed assessment"
+        },
+        "assessed_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Credibility assessment for triage (not discrimination)"
+    },
+    "conflict_check": {
+      "type": "object",
+      "properties": {
+        "submitter_under_investigation": {
+          "type": "boolean",
+          "default": false,
+          "description": "Is submitter currently under investigation?"
+        },
+        "related_alerts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "IDs of related IntegrityAlerts involving submitter"
+        },
+        "potential_retaliation_claim": {
+          "type": "boolean",
+          "default": false,
+          "description": "Flag if this might be retaliation for being investigated"
+        },
+        "conflict_notes": {
+          "type": "string"
+        }
+      },
+      "description": "Cross-check against existing investigations"
+    },
+    "external_review_status": {
+      "type": "string",
+      "enum": [
+        "not_required",
+        "pending_assignment",
+        "assigned",
+        "in_review",
+        "completed"
+      ],
+      "default": "not_required",
+      "description": "Status of external review team assessment"
+    },
+    "external_reviewer_id": {
+      "type": "string",
+      "description": "ID of external review team or individual"
+    },
+    "external_review_outcome": {
+      "type": "object",
+      "properties": {
+        "recommendation": {
+          "type": "string",
+          "enum": [
+            "proceed_investigation",
+            "dismiss_insufficient",
+            "escalate_immediately",
+            "requires_clarification"
+          ]
+        },
+        "rationale": {
+          "type": "string"
+        },
+        "reviewed_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "External reviewer's assessment"
+    },
+    "assigned_to": {
+      "type": "string",
+      "description": "Email of assigned reviewer"
+    },
+    "conflict_of_interest_flag": {
+      "type": "boolean",
+      "default": false,
+      "description": "Flag if tip involves senior leadership (route to external)"
+    },
+    "routed_to_external": {
+      "type": "boolean",
+      "default": false,
+      "description": "Was this routed to external reviewer/audit committee?"
+    },
+    "external_case_reference": {
+      "type": "string",
+      "description": "External case ID if escalated"
+    },
+    "related_alert_id": {
+      "type": "string",
+      "description": "ID of generated IntegrityAlert if applicable"
+    },
+    "follow_up_notes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "note": {
+            "type": "string"
+          },
+          "added_by": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Internal follow-up notes (confidential)"
+    },
+    "employee_feedback_requested": {
+      "type": "boolean",
+      "default": false,
+      "description": "Was feedback requested from submitter?"
+    },
+    "employee_feedback": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "feedback_type": {
+            "type": "string",
+            "enum": [
+              "follow_up_response",
+              "satisfaction_survey",
+              "clarification"
+            ]
+          },
+          "content": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Feedback from employee/submitter"
+    },
+    "retention_policy": {
+      "type": "object",
+      "properties": {
+        "retention_category": {
+          "type": "string",
+          "enum": [
+            "standard_7yr",
+            "legal_hold",
+            "permanent_record",
+            "early_destruction_approved"
+          ]
+        },
+        "destruction_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "legal_hold_reason": {
+          "type": "string"
+        },
+        "retention_notes": {
+          "type": "string"
+        }
+      },
+      "description": "Data retention policy tracking"
+    },
+    "confidential": {
+      "type": "boolean",
+      "default": true,
+      "description": "Highly confidential tip"
+    },
+    "anti_retaliation_notice_acknowledged": {
+      "type": "boolean",
+      "default": false,
+      "description": "Submitter acknowledged anti-retaliation protections"
+    }
+  },
+  "required": [
+    "tip_id",
+    "submission_method",
+    "submission_timestamp",
+    "category",
+    "summary"
+  ]
+}

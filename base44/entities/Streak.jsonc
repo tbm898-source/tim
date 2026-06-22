@@ -1,0 +1,28 @@
+{
+  "name": "Streak",
+  "type": "object",
+  "properties": {
+    "student_id": {
+      "type": "string",
+      "description": "ID of the student"
+    },
+    "current_streak": {
+      "type": "integer",
+      "default": 0,
+      "description": "Current consecutive days of activity"
+    },
+    "longest_streak": {
+      "type": "integer",
+      "default": 0,
+      "description": "Longest streak ever achieved"
+    },
+    "last_activity_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Last date of learning activity"
+    }
+  },
+  "required": [
+    "student_id"
+  ]
+}

@@ -1,0 +1,254 @@
+{
+  "name": "IntegrityAlert",
+  "type": "object",
+  "properties": {
+    "alert_type": {
+      "type": "string",
+      "enum": [
+        "financial_anomaly",
+        "approval_mismatch",
+        "vendor_change",
+        "complaint_cluster",
+        "time_pattern",
+        "access_pattern",
+        "policy_deviation",
+        "other"
+      ],
+      "description": "Type of integrity signal detected"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium",
+      "description": "Signal severity level"
+    },
+    "escalation_level": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "default": 0,
+      "description": "Escalation level: 0=Informational, 1=Review Queue, 2=Internal Investigation, 3=External Review, 4=Governance/Legal/Mandatory"
+    },
+    "escalation_level_rationale": {
+      "type": "string",
+      "description": "Evidence-based reason for current escalation level"
+    },
+    "associated_users": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Email addresses of users associated with this signal"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "under_review",
+        "escalated",
+        "resolved",
+        "false_positive"
+      ],
+      "default": "new",
+      "description": "Current status of the alert"
+    },
+    "signal_summary": {
+      "type": "string",
+      "description": "Objective description of the pattern/signal detected"
+    },
+    "signal_details": {
+      "type": "object",
+      "properties": {
+        "transaction_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "entity_type": {
+          "type": "string"
+        },
+        "entity_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "date_range": {
+          "type": "object",
+          "properties": {
+            "start": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "end": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Additional context and metadata"
+        }
+      },
+      "description": "Detailed information about the signal"
+    },
+    "corroborating_signals": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of other alerts that corroborate this pattern"
+    },
+    "detection_method": {
+      "type": "string",
+      "description": "How the signal was detected (e.g., AI analysis, rule-based, human report)"
+    },
+    "detection_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the signal was first detected"
+    },
+    "reviewed_by": {
+      "type": "string",
+      "description": "Email of the human reviewer"
+    },
+    "review_notes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Sequential review notes with timestamps"
+    },
+    "status_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "from_status": {
+            "type": "string"
+          },
+          "to_status": {
+            "type": "string"
+          },
+          "changed_by": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Immutable log of all status changes"
+    },
+    "evidence_hash": {
+      "type": "string",
+      "description": "Cryptographic hash of evidence snapshot for forensic integrity"
+    },
+    "evidence_snapshot": {
+      "type": "object",
+      "description": "Immutable snapshot of relevant data at time of detection"
+    },
+    "escalation_path": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "integer"
+          },
+          "level_name": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "escalated_by": {
+            "type": "string"
+          },
+          "rationale": {
+            "type": "string"
+          },
+          "notified_parties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "access_granted_until": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "description": "Trail of escalations with evidence-based rationale"
+    },
+    "external_case_id": {
+      "type": "string",
+      "description": "Reference ID if escalated to external forensic team or board"
+    },
+    "mandatory_reporting_triggered": {
+      "type": "boolean",
+      "default": false,
+      "description": "Flag if mandatory reporting (child abuse, etc.) was triggered"
+    },
+    "mandatory_reporting_details": {
+      "type": "object",
+      "properties": {
+        "report_type": {
+          "type": "string"
+        },
+        "reported_to": {
+          "type": "string"
+        },
+        "report_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reference_number": {
+          "type": "string"
+        }
+      },
+      "description": "Details of mandatory reporting if applicable"
+    },
+    "confidential": {
+      "type": "boolean",
+      "default": true,
+      "description": "Flag for highly sensitive alerts"
+    }
+  },
+  "required": [
+    "alert_type",
+    "signal_summary",
+    "detection_timestamp",
+    "escalation_level"
+  ]
+}

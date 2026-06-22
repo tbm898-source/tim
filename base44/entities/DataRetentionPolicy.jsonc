@@ -1,0 +1,84 @@
+{
+  "name": "DataRetentionPolicy",
+  "type": "object",
+  "properties": {
+    "policy_name": {
+      "type": "string",
+      "description": "Name of the retention policy"
+    },
+    "entity_type": {
+      "type": "string",
+      "description": "Entity type this policy applies to"
+    },
+    "retention_period_days": {
+      "type": "integer",
+      "description": "Standard retention period in days"
+    },
+    "retention_justification": {
+      "type": "string",
+      "description": "Legal or business justification for retention period"
+    },
+    "destruction_method": {
+      "type": "string",
+      "enum": [
+        "secure_delete",
+        "archive_then_delete",
+        "permanent_retention"
+      ],
+      "description": "How data should be destroyed after retention period"
+    },
+    "exceptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "exception_type": {
+            "type": "string"
+          },
+          "retention_period_days": {
+            "type": "integer"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Exceptions to standard retention"
+    },
+    "audit_requirements": {
+      "type": "object",
+      "properties": {
+        "audit_log_retention_days": {
+          "type": "integer"
+        },
+        "requires_legal_review": {
+          "type": "boolean"
+        },
+        "notification_before_destruction": {
+          "type": "boolean"
+        }
+      },
+      "description": "Audit trail requirements"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Is this policy currently active?"
+    },
+    "effective_date": {
+      "type": "string",
+      "format": "date",
+      "description": "When this policy became effective"
+    },
+    "last_reviewed_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Last review date"
+    }
+  },
+  "required": [
+    "policy_name",
+    "entity_type",
+    "retention_period_days"
+  ]
+}

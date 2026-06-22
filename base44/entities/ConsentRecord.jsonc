@@ -1,0 +1,46 @@
+{
+  "name": "ConsentRecord",
+  "type": "object",
+  "properties": {
+    "subject_token": {
+      "type": "string",
+      "description": "UUID token representing the individual"
+    },
+    "scopes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Consent scopes granted (e.g., 'talent_insights', 'peer_kudos', 'chat_transcripts')"
+    },
+    "granted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When consent was granted"
+    },
+    "revoked_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When consent was revoked (null if still active)"
+    },
+    "consent_version": {
+      "type": "string",
+      "description": "Version of consent form accepted"
+    },
+    "consent_method": {
+      "type": "string",
+      "enum": [
+        "web_form",
+        "email",
+        "verbal_documented",
+        "implied"
+      ],
+      "description": "How consent was obtained"
+    }
+  },
+  "required": [
+    "subject_token",
+    "scopes",
+    "granted_at"
+  ]
+}

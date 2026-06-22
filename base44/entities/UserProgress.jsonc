@@ -1,0 +1,62 @@
+{
+  "name": "UserProgress",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "ID of the user"
+    },
+    "student_id": {
+      "type": "string",
+      "description": "ID of the student entity"
+    },
+    "enrollment_id": {
+      "type": "string",
+      "description": "ID of the enrollment"
+    },
+    "lesson_id": {
+      "type": "string",
+      "description": "ID of the lesson"
+    },
+    "module_id": {
+      "type": "string",
+      "description": "ID of the module"
+    },
+    "course_id": {
+      "type": "string",
+      "description": "ID of the course"
+    },
+    "completed": {
+      "type": "boolean",
+      "description": "Whether the lesson is completed",
+      "default": false
+    },
+    "completion_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date when the lesson was completed"
+    },
+    "time_spent_seconds": {
+      "type": "integer",
+      "description": "Time spent on this lesson in seconds",
+      "default": 0
+    },
+    "quiz_score": {
+      "type": "integer",
+      "description": "Quiz score as a percentage (0-100)"
+    },
+    "quiz_attempt_id": {
+      "type": "string",
+      "description": "ID of the quiz attempt"
+    }
+  },
+  "required": [
+    "user_id",
+    "student_id",
+    "enrollment_id",
+    "lesson_id",
+    "module_id",
+    "course_id",
+    "completed"
+  ]
+}

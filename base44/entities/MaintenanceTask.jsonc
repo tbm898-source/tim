@@ -1,0 +1,148 @@
+{
+  "name": "MaintenanceTask",
+  "type": "object",
+  "properties": {
+    "asset_id": {
+      "type": "string",
+      "description": "ID of the asset"
+    },
+    "title": {
+      "type": "string",
+      "description": "Task title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description"
+    },
+    "task_type": {
+      "type": "string",
+      "enum": [
+        "preventive",
+        "corrective",
+        "inspection",
+        "calibration",
+        "emergency"
+      ],
+      "description": "Type of maintenance"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium",
+      "description": "Priority level"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "scheduled",
+        "in_progress",
+        "completed",
+        "cancelled",
+        "overdue"
+      ],
+      "default": "scheduled",
+      "description": "Current status"
+    },
+    "scheduled_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Scheduled date"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Due date"
+    },
+    "completed_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Completion date and time"
+    },
+    "assigned_to": {
+      "type": "string",
+      "description": "Email of assigned technician"
+    },
+    "estimated_hours": {
+      "type": "number",
+      "description": "Estimated hours to complete"
+    },
+    "actual_hours": {
+      "type": "number",
+      "description": "Actual hours spent"
+    },
+    "parts_used": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "part_id": {
+            "type": "string"
+          },
+          "part_name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "cost": {
+            "type": "number"
+          }
+        }
+      },
+      "description": "Parts used in this task"
+    },
+    "work_media_urls": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "photo",
+              "video"
+            ]
+          },
+          "caption": {
+            "type": "string"
+          },
+          "uploaded_date": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "description": "Photos and videos of work completed or issues found"
+    },
+    "completion_notes": {
+      "type": "string",
+      "description": "Notes from completing the task"
+    },
+    "clickup_task_id": {
+      "type": "string",
+      "description": "Associated ClickUp task ID"
+    },
+    "recurring": {
+      "type": "boolean",
+      "default": false,
+      "description": "Is this a recurring task?"
+    },
+    "recurrence_interval_days": {
+      "type": "integer",
+      "description": "Days between recurrences"
+    }
+  },
+  "required": [
+    "asset_id",
+    "title",
+    "task_type"
+  ]
+}

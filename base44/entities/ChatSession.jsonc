@@ -1,0 +1,39 @@
+{
+  "name": "ChatSession",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Title of the chat session, often derived from the first message."
+    },
+    "messages": {
+      "type": "array",
+      "description": "The sequence of messages in the chat.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sender": {
+            "type": "string",
+            "enum": [
+              "user",
+              "ai"
+            ]
+          },
+          "text": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "sender"
+        ]
+      }
+    }
+  },
+  "required": [
+    "title",
+    "messages"
+  ]
+}

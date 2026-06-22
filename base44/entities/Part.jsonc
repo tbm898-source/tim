@@ -1,0 +1,67 @@
+{
+  "name": "Part",
+  "type": "object",
+  "properties": {
+    "part_number": {
+      "type": "string",
+      "description": "Unique part number/SKU"
+    },
+    "name": {
+      "type": "string",
+      "description": "Part name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Part description"
+    },
+    "category": {
+      "type": "string",
+      "description": "Part category"
+    },
+    "unit_cost": {
+      "type": "number",
+      "description": "Cost per unit"
+    },
+    "quantity_in_stock": {
+      "type": "integer",
+      "default": 0,
+      "description": "Current stock quantity"
+    },
+    "minimum_stock_level": {
+      "type": "integer",
+      "default": 0,
+      "description": "Minimum stock level before reorder"
+    },
+    "reorder_quantity": {
+      "type": "integer",
+      "description": "Quantity to reorder when below minimum"
+    },
+    "supplier": {
+      "type": "string",
+      "description": "Supplier name"
+    },
+    "supplier_part_number": {
+      "type": "string",
+      "description": "Supplier's part number"
+    },
+    "location": {
+      "type": "string",
+      "description": "Storage location"
+    },
+    "compatible_assets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Asset IDs this part is compatible with"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Part image URL"
+    }
+  },
+  "required": [
+    "part_number",
+    "name"
+  ]
+}

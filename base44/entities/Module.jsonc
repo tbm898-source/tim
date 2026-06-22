@@ -1,0 +1,27 @@
+{
+  "name": "Module",
+  "type": "object",
+  "properties": {
+    "course_id": {
+      "type": "string",
+      "description": "ID of the parent course"
+    },
+    "module_number": {
+      "type": "integer",
+      "description": "Module sequence number"
+    },
+    "title": {
+      "type": "string",
+      "description": "Module title"
+    },
+    "topics": {
+      "type": "string",
+      "description": "Topics covered in this module"
+    }
+  },
+  "required": [
+    "course_id",
+    "module_number",
+    "title"
+  ]
+}

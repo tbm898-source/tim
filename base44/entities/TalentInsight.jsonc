@@ -1,0 +1,446 @@
+{
+  "name": "TalentInsight",
+  "type": "object",
+  "properties": {
+    "employee_email": {
+      "type": "string",
+      "description": "Email of the employee"
+    },
+    "employee_name": {
+      "type": "string",
+      "description": "Full name of the employee"
+    },
+    "profile_generated_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this profile was generated"
+    },
+    "skills_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "skill_name": {
+            "type": "string"
+          },
+          "evidence_type": {
+            "type": "string",
+            "enum": [
+              "training_completion",
+              "certification",
+              "tool_signoff",
+              "project_delivery"
+            ]
+          },
+          "evidence_link": {
+            "type": "string"
+          },
+          "date_achieved": {
+            "type": "string",
+            "format": "date"
+          },
+          "verified_by": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Documented skills with evidence links"
+    },
+    "strength_profile": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "skill": {
+            "type": "string"
+          },
+          "rank": {
+            "type": "integer",
+            "description": "1-3 for top 3 strengths"
+          },
+          "evidence_count": {
+            "type": "integer"
+          },
+          "evidence_links": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "Top 3 demonstrated skills with evidence"
+    },
+    "skill_gap_analysis": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "target_skill": {
+            "type": "string"
+          },
+          "current_level": {
+            "type": "string",
+            "enum": [
+              "none",
+              "beginner",
+              "intermediate",
+              "advanced"
+            ]
+          },
+          "target_level": {
+            "type": "string",
+            "enum": [
+              "intermediate",
+              "advanced",
+              "expert"
+            ]
+          },
+          "gap_severity": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "business_justification": {
+            "type": "string"
+          },
+          "evidence_of_need": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Proactive skill gap analysis"
+    },
+    "learning_path": {
+      "type": "object",
+      "properties": {
+        "path_title": {
+          "type": "string"
+        },
+        "estimated_duration_weeks": {
+          "type": "integer"
+        },
+        "milestones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "milestone_order": {
+                "type": "integer"
+              },
+              "milestone_title": {
+                "type": "string"
+              },
+              "target_completion_weeks": {
+                "type": "integer"
+              },
+              "courses_recommended": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "practice_activities": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "success_criteria": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "stretch_projects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "project_title": {
+                "type": "string"
+              },
+              "skills_applied": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "estimated_duration_weeks": {
+                "type": "integer"
+              },
+              "support_needed": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "description": "Personalized learning path with milestones and stretch projects"
+    },
+    "mentorship_recommendations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "mentor_profile_needed": {
+            "type": "string"
+          },
+          "mentorship_focus": {
+            "type": "string"
+          },
+          "interaction_frequency": {
+            "type": "string",
+            "enum": [
+              "weekly",
+              "biweekly",
+              "monthly"
+            ]
+          },
+          "duration_months": {
+            "type": "integer"
+          }
+        }
+      },
+      "description": "Mentorship pairing recommendations"
+    },
+    "delivery_metrics": {
+      "type": "object",
+      "properties": {
+        "task_completion_rate": {
+          "type": "number",
+          "description": "Percentage of tasks completed on time"
+        },
+        "quality_checks_passed": {
+          "type": "integer"
+        },
+        "rework_rate": {
+          "type": "number",
+          "description": "Percentage of work requiring rework"
+        },
+        "period_start": {
+          "type": "string",
+          "format": "date"
+        },
+        "period_end": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      "description": "Objective delivery metrics"
+    },
+    "contribution_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "project_name": {
+            "type": "string"
+          },
+          "outcome_documented": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "contribution_type": {
+            "type": "string",
+            "enum": [
+              "project_outcome",
+              "peer_kudos",
+              "mentorship_hours"
+            ]
+          },
+          "evidence_link": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Documented project outcomes and contributions"
+    },
+    "growth_trend": {
+      "type": "object",
+      "properties": {
+        "improvement_areas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "skill": {
+                "type": "string"
+              },
+              "baseline_date": {
+                "type": "string",
+                "format": "date"
+              },
+              "baseline_level": {
+                "type": "string"
+              },
+              "current_level": {
+                "type": "string"
+              },
+              "improvement_trajectory": {
+                "type": "string",
+                "enum": [
+                  "accelerating",
+                  "steady",
+                  "plateaued"
+                ]
+              }
+            }
+          }
+        },
+        "curve_description": {
+          "type": "string",
+          "description": "Narrative of improvement trend"
+        }
+      },
+      "description": "Growth trajectory analysis"
+    },
+    "mentorship_hours": {
+      "type": "number",
+      "description": "Hours spent mentoring others (documented)"
+    },
+    "peer_kudos_received": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from_peer": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "recognition_for": {
+            "type": "string"
+          },
+          "opted_in": {
+            "type": "boolean"
+          }
+        }
+      },
+      "description": "Peer kudos (opt-in only)"
+    },
+    "recommended_opportunities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "opportunity_type": {
+            "type": "string",
+            "enum": [
+              "training",
+              "stretch_project",
+              "mentorship_pairing",
+              "leadership_track"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "rationale": {
+            "type": "string"
+          },
+          "expected_benefit": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "AI-suggested next opportunities"
+    },
+    "recognition_suggestions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "recognition_type": {
+            "type": "string",
+            "enum": [
+              "public_shoutout",
+              "small_stipend",
+              "leadership_opportunity",
+              "conference_attendance"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "evidence_basis": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Recognition recommendations for leadership"
+    },
+    "succession_bench_candidate": {
+      "type": "boolean",
+      "default": false,
+      "description": "Flag for succession planning (authorized roles only)"
+    },
+    "succession_roles_qualified": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Roles candidate may be qualified for"
+    },
+    "succession_readiness_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string"
+          },
+          "evidence_points": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "gaps_to_address": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "Evidence-based succession readiness (no single-score ranking)"
+    },
+    "generated_by": {
+      "type": "string",
+      "description": "System or person who generated this insight"
+    },
+    "reviewed_by": {
+      "type": "string",
+      "description": "Human reviewer who validated this profile"
+    },
+    "review_notes": {
+      "type": "string",
+      "description": "Human reviewer notes on bias check and validation"
+    },
+    "visible_to_roles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [
+        "admin",
+        "leadership"
+      ],
+      "description": "Roles that can view this insight"
+    }
+  },
+  "required": [
+    "employee_email",
+    "employee_name",
+    "profile_generated_date"
+  ]
+}

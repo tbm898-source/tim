@@ -1,0 +1,68 @@
+{
+  "name": "PilotConfig",
+  "type": "object",
+  "properties": {
+    "config_key": {
+      "type": "string",
+      "description": "Configuration key (use 'global' for system-wide settings)"
+    },
+    "external_send_enabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Allow external data transmission (emails, API calls, webhooks)"
+    },
+    "allow_free_text_ingest": {
+      "type": "boolean",
+      "default": false,
+      "description": "Allow ingestion of unstructured narrative text"
+    },
+    "retention_days": {
+      "type": "integer",
+      "default": 90,
+      "description": "Data retention period in days"
+    },
+    "llm_access_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Allow LLM access to analytics plane data"
+    },
+    "pii_redaction_required": {
+      "type": "boolean",
+      "default": true,
+      "description": "Require PII redaction before sharing"
+    },
+    "export_requires_approval": {
+      "type": "boolean",
+      "default": true,
+      "description": "Require human approval before any export"
+    },
+    "authorized_export_roles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [
+        "admin"
+      ],
+      "description": "Roles authorized to export data"
+    },
+    "identity_vault_access_roles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [
+        "admin"
+      ],
+      "description": "Roles that can access IdentityVault"
+    },
+    "audit_log_retention_days": {
+      "type": "integer",
+      "default": 2555,
+      "description": "Audit log retention (7 years default for compliance)"
+    }
+  },
+  "required": [
+    "config_key"
+  ]
+}
