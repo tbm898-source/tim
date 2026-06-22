@@ -1,0 +1,17 @@
+{
+  "name": "DeviceEvent",
+  "type": "object",
+  "properties": {
+    "node_id": { "type": "string" },
+    "command_id": { "type": "string" },
+    "event_type": { "type": "string" },
+    "severity": {
+      "type": "string",
+      "enum": ["info", "warning", "error", "security"]
+    },
+    "message": { "type": "string" },
+    "details": { "type": "object" },
+    "occurred_at": { "type": "string", "format": "date-time" }
+  },
+  "required": ["node_id", "event_type", "severity", "message", "occurred_at"]
+}
