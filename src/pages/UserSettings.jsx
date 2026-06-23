@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AlertCircle, ArrowLeft, Trash2, User } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Trash2, User, Key, Eye, EyeOff, RefreshCw, Copy, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import {
@@ -23,10 +23,19 @@ export default function UserSettings() {
   const [user, setUser] = useState(null);
   const [confirmText, setConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [secret, setSecret] = useState('');
+  const [secretVisible, setSecretVisible] = useState(false);
+  const [secretLoading, setSecretLoading] = useState(false);
+  const [rotated, setRotated] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     loadUser();
   }, []);
+
+  useEffect(() => {
+    if (user?.role === 'admin') loadSecret();
+  }, [user]);
 
   const loadUser = async () => {
     try {
@@ -35,6 +44,40 @@ export default function UserSettings() {
     } catch (error) {
       console.error('Error loading user:', error);
     }
+  };
+
+  const loadSecret = async () => {
+    if (!user || user.role !== 'admin') return;
+    setSecretLoading(true);
+    try {
+      const res = await base44.functions.invoke('getSigningSecret', {});
+      setSecret(res.data.secret || '');
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSecretLoading(false);
+    }
+  };
+
+  const handleRotate = async () => {
+    setSecretLoading(true);
+    setRotated(false);
+    try {
+      const res = await base44.functions.invoke('getSigningSecret', { rotate: true });
+      setSecret(res.data.secret || '');
+      setRotated(true);
+      setSecretVisible(true);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSecretLoading(false);
+    }
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(secret);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleDeleteAccount = async () => {
@@ -111,6 +154,48 @@ export default function UserSettings() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Signing Secret (admin only) */}
+        {user?.role === 'admin' && (
+          <Card className="bg-slate-800/50 border-slate-700 mb-6">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Key className="w-5 h-5 text-cyan-400" />
+                TIM Command Signing Secret
+              </CardTitle>
+              <CardDescription className="text-slate-400">
+                Used by the edge agent to sign requests. Copy it into your agent's config. If you rotate it, paste the new value into <strong className="text-slate-300">Base44 Dashboard → Settings → Secrets → TIM_COMMAND_SIGNING_SECRET</strong>.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {rotated && (
+                <div className="text-xs text-amber-400 bg-amber-900/20 border border-amber-500/30 rounded p-2">
+                  ⚠️ New secret generated — copy it now, then update <strong>TIM_COMMAND_SIGNING_SECRET</strong> in Base44 Secrets settings.
+                </div>
+              )}
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Input
+                    type={secretVisible ? 'text' : 'password'}
+                    value={secret}
+                    readOnly
+                    className="bg-slate-900 border-slate-600 text-slate-300 font-mono text-sm pr-10"
+                  />
+                </div>
+                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white" onClick={() => setSecretVisible(v => !v)}>
+                  {secretVisible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </Button>
+                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white" onClick={handleCopy} disabled={!secret}>
+                  {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                </Button>
+              </div>
+              <Button variant="outline" className="border-slate-600 text-slate-300 hover:text-white hover:bg-slate-700 select-none" onClick={handleRotate} disabled={secretLoading}>
+                <RefreshCw className={`w-4 h-4 mr-2 ${secretLoading ? 'animate-spin' : ''}`} />
+                Generate New Secret
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Delete Account Section */}
         <Card className="bg-red-900/20 border-red-500/30">
