@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
 const ACTION_POLICIES = {
   'system.inventory': { risk: 'read_only', capability: 'system.inventory' },
@@ -10,16 +10,15 @@ const ACTION_POLICIES = {
   'xcode.list': { risk: 'read_only', capability: 'xcode.list' },
   'xcode.build': { risk: 'medium', capability: 'xcode.build' },
   'shortcut.run': { risk: 'high', capability: 'shortcut.run' },
-} as const;
-
-const canonicalJson = (value: unknown): string => {
-  if (value === null || typeof value !== 'object') return JSON.stringify(value);
-  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
-  const record = value as Record<string, unknown>;
-  return `{${Object.keys(record).sort().map((key) => `${JSON.stringify(key)}:${canonicalJson(record[key])}`).join(',')}}`;
 };
 
-const signCommand = async (secret: string, command: Record<string, unknown>) => {
+const canonicalJson = (value) => {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+  return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(',')}}`;
+};
+
+const signCommand = async (secret, command) => {
   const message = [
     command.command_id,
     command.node_id,
@@ -52,7 +51,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'node_id and action are required' }, { status: 400 });
     }
 
-    const policy = ACTION_POLICIES[action as keyof typeof ACTION_POLICIES];
+    const policy = ACTION_POLICIES[action];
     if (!policy) return Response.json({ error: 'Action is not allowlisted' }, { status: 400 });
     const commandSecret = Deno.env.get('TIM_COMMAND_SIGNING_SECRET');
     if (!commandSecret) return Response.json({ error: 'Device command signing is not configured' }, { status: 503 });
