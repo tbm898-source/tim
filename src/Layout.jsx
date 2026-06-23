@@ -1,4 +1,5 @@
 import React from 'react';
+import TopNav from './components/TopNav';
 import MobileBottomNav from './components/MobileBottomNav';
 
 export default function Layout({ children }) {
@@ -103,6 +104,7 @@ export default function Layout({ children }) {
           }
         }
       `}</style>
+      <TopNav />
       <main className="pt-safe pl-safe pr-safe">{children}</main>
       <MobileBottomNav />
     </div>
