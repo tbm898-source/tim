@@ -2,13 +2,17 @@
   "name": "Asset",
   "type": "object",
   "properties": {
-    "asset_tag": {
+    "asset_id": {
       "type": "string",
-      "description": "Unique asset identification tag"
+      "description": "Permanent unique human-readable ID, e.g. TIM-000001"
     },
     "name": {
       "type": "string",
       "description": "Asset name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Asset description"
     },
     "category": {
       "type": "string",
@@ -23,51 +27,6 @@
       ],
       "description": "Asset category"
     },
-    "location_id": {
-      "type": "string",
-      "description": "Current location ID"
-    },
-    "location_name": {
-      "type": "string",
-      "description": "Current location name (denormalized for quick access)"
-    },
-    "status": {
-      "type": "string",
-      "enum": [
-        "operational",
-        "maintenance_required",
-        "under_maintenance",
-        "out_of_service",
-        "retired"
-      ],
-      "default": "operational",
-      "description": "Current status"
-    },
-    "condition": {
-      "type": "string",
-      "enum": [
-        "excellent",
-        "good",
-        "fair",
-        "poor"
-      ],
-      "default": "good",
-      "description": "Physical condition"
-    },
-    "purchase_date": {
-      "type": "string",
-      "format": "date",
-      "description": "Date of purchase"
-    },
-    "purchase_cost": {
-      "type": "number",
-      "description": "Purchase cost in USD"
-    },
-    "warranty_expiry": {
-      "type": "string",
-      "format": "date",
-      "description": "Warranty expiration date"
-    },
     "manufacturer": {
       "type": "string",
       "description": "Manufacturer name"
@@ -80,35 +39,93 @@
       "type": "string",
       "description": "Serial number"
     },
-    "assigned_to": {
+    "condition": {
       "type": "string",
-      "description": "Email of person responsible"
+      "enum": [
+        "excellent",
+        "good",
+        "fair",
+        "poor"
+      ],
+      "default": "good",
+      "description": "Physical condition"
+    },
+    "location": {
+      "type": "string",
+      "description": "Location name/description"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "available",
+        "checked_out",
+        "maintenance",
+        "missing",
+        "retired"
+      ],
+      "default": "available",
+      "description": "Current status"
     },
     "notes": {
       "type": "string",
       "description": "Additional notes"
     },
+    "purchase_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of purchase"
+    },
+    "purchase_price": {
+      "type": "number",
+      "description": "Purchase price in USD"
+    },
+    "replacement_value": {
+      "type": "number",
+      "description": "Replacement value in USD"
+    },
+    "photo": {
+      "type": "string",
+      "description": "Asset photo URL"
+    },
+    "qr_code_value": {
+      "type": "string",
+      "description": "The stable value encoded in the QR code (never changes after creation)"
+    },
+    "currently_checked_out_to": {
+      "type": "string",
+      "description": "Name of person who currently has this asset"
+    },
+    "checked_out_to_email": {
+      "type": "string",
+      "description": "Email of person who currently has this asset"
+    },
+    "current_checkout_record_id": {
+      "type": "string",
+      "description": "ID of the active AssetTransaction record"
+    },
+    "expected_return_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Expected return date when checked out"
+    },
+    "created_by_email": {
+      "type": "string",
+      "description": "Email of user who created this asset"
+    },
+    "asset_tag": {
+      "type": "string",
+      "description": "Legacy asset tag field (kept for backward compatibility)"
+    },
+    "location_name": {
+      "type": "string",
+      "description": "Legacy location name field"
+    },
     "image_url": {
       "type": "string",
-      "description": "Asset image URL"
-    },
-    "last_maintenance_date": {
-      "type": "string",
-      "format": "date",
-      "description": "Last maintenance date"
-    },
-    "next_maintenance_due": {
-      "type": "string",
-      "format": "date",
-      "description": "Next scheduled maintenance date"
-    },
-    "clickup_task_id": {
-      "type": "string",
-      "description": "Associated ClickUp task ID"
+      "description": "Legacy image URL field"
     }
   },
   "required": [
-    "asset_tag",
     "name",
     "category"
   ]

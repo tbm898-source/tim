@@ -71,6 +71,8 @@ import UserSettings from './pages/UserSettings';
 import WhistleblowerReview from './pages/WhistleblowerReview';
 import WhistleblowerSubmit from './pages/WhistleblowerSubmit';
 import AdminSeedPilotData from './pages/AdminSeedPilotData';
+import AssetDetail from './pages/AssetDetail';
+import AssetForm from './pages/AssetForm';
 import __Layout from './Layout.jsx';
 
 
@@ -99,6 +101,8 @@ export const PAGES = {
     "WhistleblowerReview": WhistleblowerReview,
     "WhistleblowerSubmit": WhistleblowerSubmit,
     "AdminSeedPilotData": AdminSeedPilotData,
+    "AssetDetail": AssetDetail,
+    "AssetForm": AssetForm,
 }
 
 export const pagesConfig = {

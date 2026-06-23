@@ -1,0 +1,122 @@
+{
+  "name": "AssetTransaction",
+  "type": "object",
+  "properties": {
+    "transaction_id": {
+      "type": "string",
+      "description": "Unique transaction identifier"
+    },
+    "asset_id": {
+      "type": "string",
+      "description": "ID of the Asset record"
+    },
+    "asset_name": {
+      "type": "string",
+      "description": "Asset name (denormalized)"
+    },
+    "asset_asset_id": {
+      "type": "string",
+      "description": "Human-readable asset ID (denormalized)"
+    },
+    "transaction_type": {
+      "type": "string",
+      "enum": [
+        "checkout",
+        "checkin"
+      ],
+      "description": "Type of transaction"
+    },
+    "checked_out_to_name": {
+      "type": "string",
+      "description": "Name of person receiving the asset"
+    },
+    "checked_out_to_email": {
+      "type": "string",
+      "description": "Email of person receiving the asset"
+    },
+    "checked_out_by_email": {
+      "type": "string",
+      "description": "Email of staff performing the checkout"
+    },
+    "checkout_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date/time of checkout"
+    },
+    "expected_return_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Expected return date"
+    },
+    "checkout_condition": {
+      "type": "string",
+      "enum": [
+        "excellent",
+        "good",
+        "fair",
+        "poor"
+      ],
+      "description": "Condition at checkout"
+    },
+    "checkout_notes": {
+      "type": "string",
+      "description": "Notes at checkout"
+    },
+    "checked_in_by_email": {
+      "type": "string",
+      "description": "Email of staff performing the checkin"
+    },
+    "checkin_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date/time of checkin"
+    },
+    "checkin_condition": {
+      "type": "string",
+      "enum": [
+        "excellent",
+        "good",
+        "fair",
+        "poor"
+      ],
+      "description": "Condition at checkin"
+    },
+    "checkin_notes": {
+      "type": "string",
+      "description": "Notes at checkin"
+    },
+    "issue_reported": {
+      "type": "boolean",
+      "default": false,
+      "description": "Was an issue reported at checkin?"
+    },
+    "issue_description": {
+      "type": "string",
+      "description": "Description of reported issue"
+    },
+    "final_status": {
+      "type": "string",
+      "enum": [
+        "available",
+        "maintenance",
+        "missing",
+        "retired"
+      ],
+      "description": "Asset status set after checkin"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "closed"
+      ],
+      "default": "active",
+      "description": "Transaction status: active while checked out, closed after return"
+    }
+  },
+  "required": [
+    "asset_id",
+    "transaction_type",
+    "checked_out_to_name"
+  ]
+}
