@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { InvokeLLM, GenerateImage } from "@/integrations/Core";
-import { Learning } from "@/entities/Learning";
-import { ChatSession } from "@/entities/ChatSession";
+import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Settings, Mic, Send, Bot, User, Loader2, History, Image as ImageIcon, Film, MessageCircle, Video, BookOpen, CheckSquare, LayoutDashboard } from "lucide-react";
@@ -13,6 +11,9 @@ import StudyModePanel from "../components/seth/StudyModePanel";
 import QuizComponent from "../components/seth/QuizComponent";
 import TaskListPanel from "../components/seth/TaskListPanel";
 import StudentProgressDashboard from "../components/seth/StudentProgressDashboard";
+
+const { InvokeLLM, GenerateImage } = base44.integrations.Core;
+const { Learning, ChatSession } = base44.entities;
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = SpeechRecognition ? new SpeechRecognition() : null;

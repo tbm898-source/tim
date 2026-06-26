@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Shield, AlertCircle, Lock, FileText, CheckCircle2, Upload } from 'lucide-react';
+import { Shield, Lock, FileText, CheckCircle2, Upload } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 export default function WhistleblowerSubmit() {

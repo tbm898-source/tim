@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Save, AlertTriangle, CheckCircle, Upload } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -12,7 +11,6 @@ const CATEGORIES = ['equipment', 'tool', 'vehicle', 'facility', 'technology', 'f
 const CONDITIONS = ['excellent', 'good', 'fair', 'poor'];
 
 async function generateAssetId() {
-  const assets = await base44.entities.Asset.list('-created_date', 1);
   // Find highest existing TIM- number
   const allAssets = await base44.entities.Asset.list();
   let max = 0;
@@ -28,7 +26,10 @@ async function generateAssetId() {
 
 export default function AssetForm() {
   const navigate = useNavigate();
+  const editId = new URLSearchParams(window.location.search).get('edit');
   const [user, setUser] = useState(null);
+  const [editingAsset, setEditingAsset] = useState(null);
+  const [loading, setLoading] = useState(Boolean(editId));
   const [form, setForm] = useState({
     name: '',
     category: '',
@@ -55,6 +56,51 @@ export default function AssetForm() {
     base44.auth.me().then(setUser).catch(() => {});
   }, []);
 
+  const loadAssetForEdit = useCallback(async () => {
+    if (!editId) return;
+
+    setLoading(true);
+    try {
+      let asset = null;
+      try {
+        asset = await base44.entities.Asset.get(editId);
+      } catch {
+        const matches = await base44.entities.Asset.filter({ asset_id: editId });
+        asset = matches[0] || null;
+      }
+
+      if (!asset) {
+        setErrors({ _global: `Asset not found: ${editId}` });
+        return;
+      }
+
+      setEditingAsset(asset);
+      setForm({
+        name: asset.name || '',
+        category: asset.category || '',
+        description: asset.description || '',
+        manufacturer: asset.manufacturer || '',
+        model: asset.model || '',
+        serial_number: asset.serial_number || '',
+        condition: asset.condition || 'good',
+        location: asset.location || asset.location_name || '',
+        notes: asset.notes || '',
+        purchase_date: asset.purchase_date || '',
+        purchase_price: asset.purchase_price != null ? String(asset.purchase_price) : '',
+        replacement_value: asset.replacement_value != null ? String(asset.replacement_value) : '',
+        photo: asset.photo || asset.image_url || '',
+      });
+    } catch (err) {
+      setErrors({ _global: err.message || 'Failed to load asset for editing' });
+    } finally {
+      setLoading(false);
+    }
+  }, [editId]);
+
+  useEffect(() => {
+    loadAssetForEdit();
+  }, [loadAssetForEdit]);
+
   const set = (field, value) => {
     setForm(f => ({ ...f, [field]: value }));
     setErrors(e => ({ ...e, [field]: undefined }));
@@ -63,7 +109,8 @@ export default function AssetForm() {
   const checkSerialDuplicate = async (serial) => {
     if (!serial) return;
     const matches = await base44.entities.Asset.filter({ serial_number: serial });
-    if (matches.length > 0) {
+    const duplicate = matches.some(match => match.id !== editingAsset?.id);
+    if (duplicate) {
       setSerialWarning(true);
     } else {
       setSerialWarning(false);
@@ -102,8 +149,8 @@ export default function AssetForm() {
     }
     setSaving(true);
     try {
-      const assetId = await generateAssetId();
-      const qrCodeValue = `/AssetDetail?asset_id=${assetId}`;
+      const assetId = editingAsset?.asset_id || editingAsset?.asset_tag || await generateAssetId();
+      const qrCodeValue = editingAsset?.qr_code_value || `/AssetDetail?asset_id=${assetId}`;
       const assetData = {
         asset_id: assetId,
         qr_code_value: qrCodeValue,
@@ -120,21 +167,34 @@ export default function AssetForm() {
         purchase_price: form.purchase_price ? parseFloat(form.purchase_price) : undefined,
         replacement_value: form.replacement_value ? parseFloat(form.replacement_value) : undefined,
         photo: form.photo || undefined,
-        status: 'available',
-        created_by_email: user?.email || '',
+        status: editingAsset?.status || 'available',
+        created_by_email: editingAsset?.created_by_email || user?.email || '',
         // legacy compat
         asset_tag: assetId,
         location_name: form.location,
         image_url: form.photo || undefined,
       };
-      const created = await base44.entities.Asset.create(assetData);
-      setSuccess(created);
+      const saved = editingAsset
+        ? await base44.entities.Asset.update(editingAsset.id, assetData)
+        : await base44.entities.Asset.create(assetData);
+      setSuccess(saved);
     } catch (err) {
       setErrors({ _global: err.message || 'Failed to save asset' });
     } finally {
       setSaving(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white p-6 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-400">Loading asset...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (success) {
     return (
@@ -143,11 +203,13 @@ export default function AssetForm() {
           <Card className="bg-gray-800 border-green-500">
             <CardContent className="pt-8 pb-8 text-center space-y-4">
               <CheckCircle className="w-16 h-16 text-green-400 mx-auto" />
-              <h2 className="text-2xl font-bold text-white">Asset Created!</h2>
+              <h2 className="text-2xl font-bold text-white">{editingAsset ? 'Asset Updated!' : 'Asset Created!'}</h2>
               <p className="text-gray-300">
                 <span className="font-mono text-cyan-400 text-lg">{success.asset_id}</span>
               </p>
-              <p className="text-gray-400 text-sm">A QR code has been generated and is available on the asset detail page.</p>
+              <p className="text-gray-400 text-sm">
+                The asset QR code is available on the asset detail page and remains stable for scanning.
+              </p>
               <div className="flex flex-col gap-3 pt-2">
                 <Button
                   className="bg-cyan-600 hover:bg-cyan-700 w-full"
@@ -155,18 +217,20 @@ export default function AssetForm() {
                 >
                   View Asset & Print Label
                 </Button>
-                <Button
-                  variant="outline"
-                  className="border-gray-600 text-white hover:bg-gray-700 w-full"
-                  onClick={() => {
-                    setSuccess(null);
-                    setForm({ name: '', category: '', description: '', manufacturer: '', model: '', serial_number: '', condition: 'good', location: '', notes: '', purchase_date: '', purchase_price: '', replacement_value: '', photo: '' });
-                    setSerialWarning(false);
-                    setSerialConfirmed(false);
-                  }}
-                >
-                  Add Another Asset
-                </Button>
+                {!editingAsset && (
+                  <Button
+                    variant="outline"
+                    className="border-gray-600 text-white hover:bg-gray-700 w-full"
+                    onClick={() => {
+                      setSuccess(null);
+                      setForm({ name: '', category: '', description: '', manufacturer: '', model: '', serial_number: '', condition: 'good', location: '', notes: '', purchase_date: '', purchase_price: '', replacement_value: '', photo: '' });
+                      setSerialWarning(false);
+                      setSerialConfirmed(false);
+                    }}
+                  >
+                    Add Another Asset
+                  </Button>
+                )}
                 <Link to="/AssetManagement">
                   <Button variant="ghost" className="text-gray-400 hover:text-white w-full">Back to Asset List</Button>
                 </Link>
@@ -189,9 +253,13 @@ export default function AssetForm() {
           </Link>
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-              Add New Asset
+              {editingAsset ? 'Edit Asset' : 'Add New Asset'}
             </h1>
-            <p className="text-gray-400 text-sm">A unique ID and QR code will be generated automatically.</p>
+            <p className="text-gray-400 text-sm">
+              {editingAsset
+                ? 'Update details without changing the asset ID or QR code.'
+                : 'A unique ID and QR code will be generated automatically.'}
+            </p>
           </div>
         </div>
 
@@ -422,12 +490,12 @@ export default function AssetForm() {
             {saving ? (
               <span className="flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Saving...
+                {editingAsset ? 'Updating...' : 'Saving...'}
               </span>
             ) : (
               <span className="flex items-center gap-2">
                 <Save className="w-4 h-4" />
-                Save Asset
+                {editingAsset ? 'Update Asset' : 'Save Asset'}
               </span>
             )}
           </Button>

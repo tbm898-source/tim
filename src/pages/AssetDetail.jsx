@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   ArrowLeft, Edit, QrCode, Printer, LogIn, LogOut,
-  User, Clock, AlertTriangle, CheckCircle, Package, MapPin, Wrench
+  User, Clock, AlertTriangle, Package
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import AssetQRCode from '../components/asset/AssetQRCode';
@@ -137,13 +137,7 @@ export default function AssetDetail() {
         <h2 style={{ fontWeight: 'bold', fontSize: '18px', margin: '0 0 4px' }}>TIM Asset</h2>
         <h3 style={{ fontSize: '16px', margin: '0 0 8px' }}>{asset.name}</h3>
         <p style={{ fontFamily: 'monospace', fontSize: '14px', margin: '0 0 8px' }}>{asset.asset_id}</p>
-        {asset.qr_code_value && (
-          <img
-            src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(asset.qr_code_value)}&format=png&ecc=M`}
-            alt="QR Code"
-            style={{ width: '200px', height: '200px', margin: '8px 0' }}
-          />
-        )}
+        <AssetQRCode asset={asset} size={200} showDownload={false} showPrint={false} showEncodedValue={false} />
         <p style={{ fontSize: '12px', margin: '4px 0' }}>Category: {asset.category}</p>
         {asset.serial_number && <p style={{ fontSize: '12px', margin: '4px 0' }}>S/N: {asset.serial_number}</p>}
         <p style={{ fontSize: '10px', color: '#666', marginTop: '8px' }}>Property of TIM</p>

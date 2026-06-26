@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Bot, MonitorSmartphone, Wrench, ShieldCheck, GraduationCap, Settings, BarChart3, Users } from 'lucide-react';
+import { Bot, MonitorSmartphone, Wrench, ShieldCheck, Settings, BarChart3, Users } from 'lucide-react';
 
 const navItems = [
   { name: 'TIM', path: '/', icon: Bot },

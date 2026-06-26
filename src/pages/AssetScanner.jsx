@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Camera, Package, MapPin, AlertTriangle, Search, LogOut, LogIn, User, Eye } from 'lucide-react';
+import { Camera, MapPin, AlertTriangle, Search, LogOut, LogIn, User, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import QRScanner from '../components/maintenance/QRScanner';
 import CheckoutModal from '../components/asset/CheckoutModal';

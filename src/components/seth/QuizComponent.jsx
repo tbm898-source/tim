@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, XCircle, Trophy, RotateCcw } from 'lucide-react';
+import { CheckCircle, XCircle } from 'lucide-react';
 
 export default function QuizComponent({ quiz, onAnswer, onComplete }) {
   const [currentQuestion, setCurrentQuestion] = useState(0);

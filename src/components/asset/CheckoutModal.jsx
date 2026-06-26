@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CheckCircle, AlertTriangle, User, Calendar } from 'lucide-react';
+import { CheckCircle, AlertTriangle } from 'lucide-react';
 
 export default function CheckoutModal({ asset, isOpen, onClose, onSuccess }) {
   const [form, setForm] = useState({
