@@ -25,6 +25,7 @@ export default function StudentProgressDashboard() {
     const [enrollments, setEnrollments] = useState([]);
     const [pathways, setPathways] = useState([]);
     const [progress, setProgress] = useState([]);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         loadData();
@@ -32,17 +33,24 @@ export default function StudentProgressDashboard() {
 
     const loadData = async () => {
         setLoading(true);
-        const [s, e, p, pr] = await Promise.all([
-            base44.entities.Student.list(),
-            base44.entities.Enrollment.list(),
-            base44.entities.LearningPathway.list(),
-            base44.entities.UserProgress.list(),
-        ]);
-        setStudents(s);
-        setEnrollments(e);
-        setPathways(p);
-        setProgress(pr);
-        setLoading(false);
+        setError(null);
+        try {
+            const [s, e, p, pr] = await Promise.all([
+                base44.entities.Student.list(),
+                base44.entities.Enrollment.list(),
+                base44.entities.LearningPathway.list(),
+                base44.entities.UserProgress.list(),
+            ]);
+            setStudents(s);
+            setEnrollments(e);
+            setPathways(p);
+            setProgress(pr);
+        } catch (loadError) {
+            console.error('Unable to load learning status:', loadError);
+            setError('Learning data is unavailable right now.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (loading) {
@@ -50,6 +58,16 @@ export default function StudentProgressDashboard() {
             <div className="flex items-center justify-center py-16 text-cyan-400">
                 <Loader2 className="w-6 h-6 animate-spin mr-2" />
                 <span>Loading dashboard...</span>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-6 text-center">
+                <AlertCircle className="mx-auto h-6 w-6 text-amber-300" />
+                <p className="mt-3 text-sm text-amber-100">{error}</p>
+                <button type="button" onClick={loadData} className="mt-4 rounded-lg border border-amber-400/30 px-3 py-2 text-sm text-amber-100 hover:bg-amber-400/10">Try again</button>
             </div>
         );
     }

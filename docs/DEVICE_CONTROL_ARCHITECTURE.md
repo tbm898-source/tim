@@ -14,7 +14,7 @@ TIM web console
     │ request / approve / inspect
     ▼
 Base44 DeviceCommand ledger
-    │ authenticated polling
+    │ signed deviceAgentBridge calls
     ▼
 Trusted edge agent ──► Windows / Android Studio / ADB
                    └─► macOS / Xcode / Shortcuts
@@ -36,7 +36,7 @@ Android's official tooling exposes device operations through [Android Debug Brid
 
 ## Command policy
 
-The cloud function and local dispatcher both validate the action. Base44 signs each authorized command with `TIM_COMMAND_SIGNING_SECRET`; the edge agent verifies that signature before execution. The signature binds the node, action, risk, expiry, approval time, and complete payload, so changing any of them invalidates the command. Passing one layer is not enough.
+The cloud functions and local dispatcher both validate the action. Base44 signs each authorized command with `TIM_COMMAND_SIGNING_SECRET`; the edge agent verifies that signature before execution. The same secret also signs agent-to-Base44 bridge requests as `HMAC-SHA256("<timestamp>.<rawBody>")`, and the bridge rejects stale, unsigned, or non-allowlisted requests. The command signature binds the node, action, risk, expiry, approval time, and complete payload, so changing any of them invalidates the command. Passing one layer is not enough.
 
 | Action | Risk | Approval | Local restriction |
 |---|---:|---:|---|
@@ -56,19 +56,19 @@ There is no `shell.exec`, arbitrary executable path, arbitrary command argument 
 
 1. Generate a long random `TIM_COMMAND_SIGNING_SECRET` and store it as a protected Base44 function secret.
 2. Deploy the three new Base44 entities: `DeviceNode`, `DeviceCommand`, and `DeviceEvent`.
-3. Deploy `queueDeviceCommand` and `approveDeviceCommand`.
+3. Deploy `queueDeviceCommand`, `approveDeviceCommand`, and `deviceAgentBridge`.
 4. Publish the updated frontend.
-5. On one Windows machine, configure the same signing secret and the agent with `TIM_TRUST_LEVEL=observe`, start it, and confirm heartbeats and read-only inventory.
+5. On one Windows or Mac machine, configure the same signing secret plus the `deviceAgentBridge` endpoint, start the agent with `TIM_TRUST_LEVEL=observe`, and confirm heartbeats and read-only inventory.
 6. Change that machine to `assist` only after the command ledger and approval flow are verified.
 7. Pair Android with ADB and test `android.devices` before build or install actions.
 8. Repeat on a Mac for Xcode and a small Shortcuts allowlist.
 
-The repository owner must perform or authorize Base44 publication. This checkout cannot publish to GitHub because the authenticated account currently has read-only repository access.
+The repository owner must perform or authorize Base44 publication and any GitHub push/deploy action.
 
 ## Production hardening backlog
 
-- One-time pairing codes and device-scoped, revocable credentials instead of user tokens
-- Signed commands with nonce and expiry validation on the edge agent
+- One-time pairing codes and device-scoped, revocable credentials instead of the shared bridge secret
+- Nonce/replay cache in addition to bridge timestamp validation
 - Atomic command claiming to prevent two agents from executing the same request
 - Encrypted local credential storage using Windows Credential Manager and macOS Keychain
 - Automatic service installers and health supervision for Windows and macOS

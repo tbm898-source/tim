@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  com.tim.tim-edge.plist.example
+  ==============================
+  LaunchAgent template for the TIM edge agent on macOS.
+
+  REVIEW BEFORE INSTALLING
+  -------------------------
+  1. Replace every PLACEHOLDER string with its actual absolute path.
+     launchd does NOT expand ~ or $HOME — you must use full absolute paths.
+  2. Create the log directory before installing:
+       mkdir -p /Users/YOUR_USERNAME/Library/Logs/TIM
+  3. Copy the final plist to ~/Library/LaunchAgents/:
+       cp com.tim.tim-edge.plist ~/Library/LaunchAgents/com.tim.tim-edge.plist
+  4. Load it only after connected mode is verified to work manually:
+       launchctl load ~/Library/LaunchAgents/com.tim.tim-edge.plist
+  5. To unload:
+       launchctl unload ~/Library/LaunchAgents/com.tim.tim-edge.plist
+
+  Do NOT install or load this file during initial setup.
+  Do NOT embed TIM_COMMAND_SIGNING_SECRET here; the wrapper reads it from Keychain.
+-->
+<plist version="1.0">
+<dict>
+
+  <key>Label</key>
+  <string>com.tim.tim-edge</string>
+
+  <!--
+    Replace PLACEHOLDER_REPO_ROOT with the absolute path to this repository.
+    Example: /Users/timmi/Library/CloudStorage/Dropbox/CANONICAL/30_CODE/tim
+  -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>PLACEHOLDER_REPO_ROOT/agent/macos/run-tim-edge.sh</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>PLACEHOLDER_REPO_ROOT</string>
+
+  <!--
+    Replace PLACEHOLDER_USERNAME with your macOS username.
+    Example: timmi
+  -->
+  <key>StandardOutPath</key>
+  <string>/Users/PLACEHOLDER_USERNAME/Library/Logs/TIM/tim-edge.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/Users/PLACEHOLDER_USERNAME/Library/Logs/TIM/tim-edge-error.log</string>
+
+  <!-- Restart automatically if the process exits, after a 30-second delay -->
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>ThrottleInterval</key>
+  <integer>30</integer>
+
+  <!-- Do not start automatically at login; load manually after verification -->
+  <key>RunAtLoad</key>
+  <false/>
+
+  <!-- Run as the current user, not root -->
+  <!-- No NetworkListener: agent connects outbound only, does not bind a port -->
+
+</dict>
+</plist>

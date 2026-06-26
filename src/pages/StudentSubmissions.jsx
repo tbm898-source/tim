@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Upload, FileText, Send, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Loader2, Upload, FileText, Send, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function StudentSubmissions() {

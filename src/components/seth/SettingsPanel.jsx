@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { X, Brain, AlertTriangle } from "lucide-react";
+import { X } from "lucide-react";
 
 export default function SettingsPanel({ settings, onSettingsChange, onClose, voices }) {
     const handleSliderChange = (key, value) => {
@@ -29,63 +29,16 @@ export default function SettingsPanel({ settings, onSettingsChange, onClose, voi
             className="fixed top-0 right-0 h-full w-full max-w-sm bg-black border-l border-cyan-500/50 shadow-2xl shadow-cyan-500/20 p-6 z-50 text-white overflow-y-auto"
         >
             <div className="flex justify-between items-center mb-8">
-                <h2 className="text-2xl font-bold text-cyan-300">SETH Settings</h2>
+                <div>
+                    <h2 className="text-2xl font-bold text-cyan-300">TIM Settings</h2>
+                    <p className="mt-1 text-sm text-gray-400">Tune how TIM speaks and responds.</p>
+                </div>
                 <Button variant="ghost" size="icon" onClick={onClose}>
                     <X className="h-6 w-6" />
                 </Button>
             </div>
 
             <div className="space-y-8">
-                {/* Unrestricted Content Setting */}
-                <div>
-                    <Label className="text-lg text-red-400 flex items-center gap-2">
-                        <AlertTriangle className="w-5 h-5" />
-                        Content Protocol
-                    </Label>
-                    <p className="text-sm text-gray-400 mb-4">Control content generation boundaries.</p>
-                    <div className="flex items-center justify-between p-3 bg-red-900/30 rounded-lg border border-red-500/50">
-                        <div>
-                            <Label htmlFor="unrestrictedMode" className="font-bold text-red-300">Unrestricted Mode (NSFW)</Label>
-                            <p className="text-xs text-red-300/80 mt-1">Enables generation of any content, including explicit topics.</p>
-                        </div>
-                        <Switch
-                            id="unrestrictedMode"
-                            checked={settings.unrestrictedMode}
-                            onCheckedChange={(checked) => handleSwitchChange('unrestrictedMode', checked)}
-                        />
-                    </div>
-                </div>
-
-                {/* Intelligence Settings */}
-                <div>
-                    <Label className="text-lg text-cyan-400 flex items-center gap-2">
-                        <Brain className="w-5 h-5" />
-                        Intelligence
-                    </Label>
-                    <p className="text-sm text-gray-400 mb-4">Control cognitive sophistication and analytical depth.</p>
-                    
-                    <div>
-                        <div className="flex justify-between items-baseline mb-2">
-                            <Label htmlFor="intelligence">Cognitive Level</Label>
-                            <span className="text-cyan-300 font-mono">
-                                {settings.intelligence < 30 ? 'Basic' : 
-                                 settings.intelligence < 70 ? 'Advanced' : 'Genius'}
-                            </span>
-                        </div>
-                        <Slider
-                            id="intelligence"
-                            min={0}
-                            max={100}
-                            step={1}
-                            value={[settings.intelligence]}
-                            onValueChange={(val) => handleSliderChange('intelligence', val)}
-                        />
-                        <p className="text-xs text-gray-500 mt-2">
-                            Higher levels enable complex reasoning, sophisticated vocabulary, and deeper analysis.
-                        </p>
-                    </div>
-                </div>
-
                 {/* Voice Settings */}
                 <div>
                     <Label className="text-lg text-cyan-400">Voice Configuration</Label>

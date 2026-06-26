@@ -24,12 +24,20 @@ export default function TaskListPanel() {
     const [loading, setLoading] = useState(true);
     const [syncing, setSyncing] = useState(false);
     const [syncResult, setSyncResult] = useState(null);
+    const [error, setError] = useState(null);
 
     const loadTasks = async () => {
         setLoading(true);
-        const all = await base44.entities.MaintenanceTask.list('-updated_date', 50);
-        setTasks(all);
-        setLoading(false);
+        setError(null);
+        try {
+            const all = await base44.entities.MaintenanceTask.list('-updated_date', 50);
+            setTasks(all);
+        } catch (loadError) {
+            console.error('Unable to load maintenance tasks:', loadError);
+            setError('The work queue is unavailable right now.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => { loadTasks(); }, []);
@@ -37,10 +45,16 @@ export default function TaskListPanel() {
     const handleSync = async () => {
         setSyncing(true);
         setSyncResult(null);
-        const res = await base44.functions.invoke('syncClickUpTasks', {});
-        setSyncResult(res.data);
-        await loadTasks();
-        setSyncing(false);
+        try {
+            const res = await base44.functions.invoke('syncClickUpTasks', {});
+            setSyncResult(res.data);
+            await loadTasks();
+        } catch (syncError) {
+            console.error('Unable to sync ClickUp tasks:', syncError);
+            setSyncResult({ ok: false, error: 'ClickUp sync failed. Check the connector and try again.' });
+        } finally {
+            setSyncing(false);
+        }
     };
 
     return (
@@ -79,6 +93,11 @@ export default function TaskListPanel() {
             {loading ? (
                 <div className="flex justify-center py-8">
                     <Loader2 className="w-6 h-6 animate-spin text-cyan-400" />
+                </div>
+            ) : error ? (
+                <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-6 text-center">
+                    <p className="text-sm text-amber-100">{error}</p>
+                    <Button type="button" variant="outline" size="sm" onClick={loadTasks} className="mt-3 border-amber-400/30 text-amber-100 hover:bg-amber-400/10">Try again</Button>
                 </div>
             ) : tasks.length === 0 ? (
                 <div className="text-center py-8 text-gray-500 text-sm">

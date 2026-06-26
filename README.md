@@ -7,6 +7,7 @@ TIM is a Base44-powered personal operations copilot. Its primary interface is a 
 - AI chat, image generation, study tools, and conversation history
 - Trusted-device command ledger with approval-gated execution and audit events
 - A local edge agent for Windows/Android Studio/ADB and macOS/Xcode/Shortcuts
+- A signed `deviceAgentBridge` backend function so agents do not need a broad Base44 user token
 - Asset, location, camera-system, parts, and maintenance records
 - Maintenance work queue with ClickUp synchronization
 - Integrity monitoring, evidence workflows, and talent/learning tools
@@ -14,6 +15,12 @@ TIM is a Base44-powered personal operations copilot. Its primary interface is a 
 TIM only has operational access through configured Base44 entities, backend functions, and connectors. The interface must not imply that a device or service is connected when it is not.
 
 Device control requires a TIM edge agent on each trusted computer. See [agent/README.md](agent/README.md) for setup and [docs/DEVICE_CONTROL_ARCHITECTURE.md](docs/DEVICE_CONTROL_ARCHITECTURE.md) for the security model and platform limits.
+
+Required device-control functions:
+
+- `queueDeviceCommand`
+- `approveDeviceCommand`
+- `deviceAgentBridge`
 
 ## Run locally
 

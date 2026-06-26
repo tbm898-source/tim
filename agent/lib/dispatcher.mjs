@@ -1,4 +1,4 @@
-import { access } from 'node:fs/promises';
+import { access, constants } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { execFile, spawn } from 'node:child_process';
@@ -79,17 +79,49 @@ async function commandAvailable(file, platform) {
   }
 }
 
+async function appExists(appPath) {
+  try {
+    await access(appPath, constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function discoverCapabilities(config, platform = process.platform) {
   const capabilities = ['system.inventory', 'network.ping'];
+
   if (await commandAvailable(config.adbPath, platform)) {
     capabilities.push('android.devices', 'android.install');
   }
+
   if (config.allowedWorkspaces.length) capabilities.push('android.build');
-  if (platform === 'win32' && config.androidStudioPath) capabilities.push('app.launch');
-  if (platform === 'darwin') {
-    capabilities.push('app.launch', 'xcode.list', 'xcode.build');
-    if (config.allowedShortcuts.length) capabilities.push('shortcut.run');
+
+  if (platform === 'win32') {
+    if (config.androidStudioPath && await appExists(config.androidStudioPath)) {
+      capabilities.push('app.launch');
+    }
   }
+
+  if (platform === 'darwin') {
+    // Xcode: only if xcodebuild is actually executable
+    if (await commandAvailable('xcodebuild', platform)) {
+      capabilities.push('xcode.list', 'xcode.build');
+    }
+
+    // app.launch on darwin: Xcode requires xcodebuild present; Android Studio requires the .app bundle
+    const canLaunchXcode = await commandAvailable('xcodebuild', platform);
+    const canLaunchAndroidStudio = await appExists('/Applications/Android Studio.app');
+    if (canLaunchXcode || canLaunchAndroidStudio) {
+      capabilities.push('app.launch');
+    }
+
+    // shortcut.run: shortcuts CLI must be present and allowlist must be non-empty
+    if (config.allowedShortcuts.length && await commandAvailable('shortcuts', platform)) {
+      capabilities.push('shortcut.run');
+    }
+  }
+
   return capabilities;
 }
 

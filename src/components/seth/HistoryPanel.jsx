@@ -1,20 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ChatSession } from "@/entities/ChatSession";
+import { base44 } from "@/api/base44Client";
 import { X, Plus, MessageSquare, Loader2 } from "lucide-react";
+
+const { ChatSession } = base44.entities;
 
 export default function HistoryPanel({ onNewChat, onLoadSession, onClose }) {
     const [sessions, setSessions] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchSessions = async () => {
-            setIsLoading(true);
+    const fetchSessions = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
             const fetchedSessions = await ChatSession.list("-created_date", 50);
             setSessions(fetchedSessions);
+        } catch (loadError) {
+            console.error('Unable to load conversation history:', loadError);
+            setError('Conversation history is unavailable right now.');
+        } finally {
             setIsLoading(false);
-        };
+        }
+    };
+
+    useEffect(() => {
         fetchSessions();
     }, []);
 
@@ -46,6 +57,11 @@ export default function HistoryPanel({ onNewChat, onLoadSession, onClose }) {
                 {isLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <Loader2 className="h-8 w-8 text-cyan-400 animate-spin" />
+                    </div>
+                ) : error ? (
+                    <div className="pt-10 text-center">
+                        <p className="text-sm text-amber-200">{error}</p>
+                        <Button type="button" variant="outline" size="sm" onClick={fetchSessions} className="mt-4 border-white/10">Try again</Button>
                     </div>
                 ) : sessions.length === 0 ? (
                     <div className="text-center text-gray-500 pt-10">

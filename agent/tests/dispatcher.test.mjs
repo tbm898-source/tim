@@ -63,3 +63,63 @@ test('command signatures bind the payload and approval', () => {
   assert.equal(verifyCommandAuthorization(signed, 'test-secret'), true);
   assert.equal(verifyCommandAuthorization({ ...signed, payload: { app: 'xcode' } }, 'test-secret'), false);
 });
+
+test('shortcut.run is rejected when shortcut name is not in allowlist', async () => {
+  await assert.rejects(
+    executeCommand(
+      { action: 'shortcut.run', payload: { name: 'Unlisted Shortcut' } },
+      { config, platform: 'darwin', approved: true },
+    ),
+    /not allowlisted/,
+  );
+});
+
+test('shortcut.run is rejected when allowlist is empty', async () => {
+  const restrictedConfig = { ...config, allowedShortcuts: [] };
+  await assert.rejects(
+    executeCommand(
+      { action: 'shortcut.run', payload: { name: 'Lights On' } },
+      { config: restrictedConfig, platform: 'darwin', approved: true },
+    ),
+    /not allowlisted/,
+  );
+});
+
+test('darwin-only actions are rejected on non-darwin platforms', async () => {
+  await assert.rejects(
+    executeCommand(
+      { action: 'xcode.list', payload: { project: path.join(config.allowedWorkspaces[0], 'App.xcodeproj') } },
+      { config, platform: 'win32', approved: true },
+    ),
+    /unavailable on win32/,
+  );
+});
+
+test('invalid command authorization is rejected', () => {
+  const command = {
+    command_id: 'cmd-bad',
+    node_id: 'node-1',
+    action: 'system.inventory',
+    risk: 'read_only',
+    expires_at: '2030-01-01T00:00:00.000Z',
+    approved_at: '',
+    payload: {},
+    authorization: 'a'.repeat(64),
+  };
+  assert.equal(verifyCommandAuthorization(command, 'correct-secret'), false);
+});
+
+test('modified payload invalidates command authorization', () => {
+  const command = {
+    command_id: 'cmd-2',
+    node_id: 'node-1',
+    action: 'network.ping',
+    risk: 'read_only',
+    expires_at: '2030-01-01T00:00:00.000Z',
+    approved_at: '',
+    payload: { host: '192.168.1.1' },
+  };
+  const signed = { ...command, authorization: signCommand(command, 'test-secret') };
+  const tampered = { ...signed, payload: { host: 'evil.example.com' } };
+  assert.equal(verifyCommandAuthorization(tampered, 'test-secret'), false);
+});
