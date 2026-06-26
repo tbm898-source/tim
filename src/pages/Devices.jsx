@@ -77,12 +77,12 @@ function EmptyState({ previewMode }) {
 export default function Devices() {
   const [nodes, setNodes] = useState([]);
   const [commands, setCommands] = useState([]);
-  const [loading, setLoading] = useState(!appParams.previewMode);
+  const [loading, setLoading] = useState(!appParams.isPreviewMode);
   const [workingId, setWorkingId] = useState('');
   const [error, setError] = useState('');
 
   const loadData = useCallback(async () => {
-    if (appParams.previewMode) return;
+    if (appParams.isPreviewMode) return;
     setLoading(true);
     setError('');
     try {
@@ -145,7 +145,7 @@ export default function Devices() {
             <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Trusted devices</h1>
             <p className="mt-2 max-w-2xl text-slate-400">See each machine’s actual capabilities, queue bounded actions, approve consequential work, and verify the result.</p>
           </div>
-          <Button onClick={loadData} variant="outline" disabled={loading || appParams.previewMode} className="border-white/10 bg-slate-900 text-slate-200 hover:bg-white/10 hover:text-white">
+          <Button onClick={loadData} variant="outline" disabled={loading || appParams.isPreviewMode} className="border-white/10 bg-slate-900 text-slate-200 hover:bg-white/10 hover:text-white">
             <RefreshCw className={loading ? 'animate-spin' : ''} /> Refresh
           </Button>
         </header>
@@ -181,7 +181,7 @@ export default function Devices() {
               <Card className="border-white/10 bg-white/[0.03]">
                 <CardContent className="flex items-center justify-center gap-3 py-14 text-slate-400"><Loader2 className="animate-spin" /> Loading trusted devices…</CardContent>
               </Card>
-            ) : nodes.length === 0 ? <EmptyState previewMode={appParams.previewMode} /> : (
+            ) : nodes.length === 0 ? <EmptyState previewMode={appParams.isPreviewMode} /> : (
               <div className="grid gap-4 xl:grid-cols-2">
                 {nodes.map((node) => {
                   const PlatformIcon = PLATFORM_ICONS[node.platform] || MonitorSmartphone;

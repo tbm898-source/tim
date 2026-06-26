@@ -70,6 +70,15 @@ function runDetached(file, args) {
 }
 
 async function commandAvailable(file, platform) {
+  if (path.isAbsolute(file) || file.includes(path.sep)) {
+    try {
+      await access(file);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   const locator = platform === 'win32' ? 'where.exe' : 'which';
   try {
     await execFileAsync(locator, [file], { timeout: 3_000, windowsHide: true });
