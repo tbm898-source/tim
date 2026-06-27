@@ -12,7 +12,7 @@ npm run agent:capabilities
 
 ## Configure Windows and Android
 
-Set values in the host environment or in a local `.env` mechanism managed outside this repository. Never commit an access token.
+Set values in the host environment or in a local `.env` mechanism managed outside this repository. Never commit the signing secret.
 
 ```powershell
 $env:TIM_NODE_ID = 'tim-office-windows'
@@ -21,7 +21,6 @@ $env:TIM_TRUST_LEVEL = 'assist'
 $env:TIM_ALLOWED_WORKSPACES = 'C:\Users\Tim\AndroidStudioProjects;C:\Users\Tim\Projects'
 $env:TIM_ANDROID_STUDIO_PATH = 'C:\Program Files\Android\Android Studio\bin\studio64.exe'
 $env:TIM_ADB_PATH = 'C:\Users\Tim\AppData\Local\Android\Sdk\platform-tools\adb.exe'
-$env:TIM_BASE44_ACCESS_TOKEN = '<temporary-admin-token>'
 $env:TIM_COMMAND_SIGNING_SECRET = '<same-long-random-secret-configured-in-base44>'
 npm run agent:run
 ```
@@ -36,7 +35,6 @@ export TIM_NODE_NAME='Primary Mac'
 export TIM_TRUST_LEVEL='assist'
 export TIM_ALLOWED_WORKSPACES="$HOME/Developer:$HOME/Projects"
 export TIM_ALLOWED_SHORTCUTS='Good Night,Start Work'
-export TIM_BASE44_ACCESS_TOKEN='<temporary-admin-token>'
 export TIM_COMMAND_SIGNING_SECRET='<same-long-random-secret-configured-in-base44>'
 npm run agent:run
 ```
@@ -66,4 +64,4 @@ Consequential local tests such as `android.build`, `android.install`, `app.launc
 
 Configure `TIM_COMMAND_SIGNING_SECRET` as a protected Base44 function secret and separately on every trusted agent. The agent rejects any command whose signature is missing or does not match its payload, approval timestamp, node, risk, and expiry.
 
-The first version still uses a Base44 admin access token on each trusted host. That is functional but not the final production identity model. Before exposing the control plane beyond a private test environment, replace it with one-time pairing and a device-scoped, revocable credential.
+The agent uses the HMAC-protected `deviceAgentBridge` function for connected mode, so it does not need a Base44 user access token on the trusted host. Before exposing the control plane beyond a private test environment, replace shared-secret provisioning with one-time pairing and device-scoped, revocable credentials.

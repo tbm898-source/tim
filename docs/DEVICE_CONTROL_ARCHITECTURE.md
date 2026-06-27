@@ -67,7 +67,7 @@ The repository owner must perform or authorize Base44 publication. This checkout
 
 ## Production hardening backlog
 
-- One-time pairing codes and device-scoped, revocable credentials instead of user tokens
+- One-time pairing codes and device-scoped, revocable credentials instead of manually copied shared secrets
 - Signed commands with nonce and expiry validation on the edge agent
 - Atomic command claiming to prevent two agents from executing the same request
 - Encrypted local credential storage using Windows Credential Manager and macOS Keychain

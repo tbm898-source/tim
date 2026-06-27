@@ -13,7 +13,6 @@ export function loadAgentConfig(env = process.env) {
   return {
     appId: env.TIM_BASE44_APP_ID || '695cfbf7fba07f58d25ff8bb',
     serverUrl: env.TIM_BASE44_SERVER_URL || 'https://base44.app',
-    token: env.TIM_BASE44_ACCESS_TOKEN || '',
     commandSecret: env.TIM_COMMAND_SIGNING_SECRET || '',
     nodeId: env.TIM_NODE_ID || os.hostname().toLowerCase().replace(/[^a-z0-9.-]/g, '-'),
     displayName: env.TIM_NODE_NAME || os.hostname(),

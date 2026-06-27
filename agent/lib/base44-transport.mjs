@@ -1,30 +1,52 @@
-import { createClient } from '@base44/sdk';
+import { createHmac } from 'node:crypto';
 import os from 'node:os';
 import { discoverCapabilities, executeCommand } from './dispatcher.mjs';
 import { verifyCommandAuthorization } from './authorization.mjs';
 
 const delay = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
-async function publishEvent(base44, event) {
+function getFunctionUrl(config) {
+  return `${config.serverUrl.replace(/\/$/, '')}/api/apps/${config.appId}/functions/deviceAgentBridge`;
+}
+
+async function bridgeRequest(config, action, payload = {}) {
+  const body = JSON.stringify({ action, payload });
+  const timestamp = Math.floor(Date.now() / 1000).toString();
+  const signature = createHmac('sha256', config.commandSecret)
+    .update(`${timestamp}.${body}`)
+    .digest('hex');
+
+  const response = await fetch(getFunctionUrl(config), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-TIM-Timestamp': timestamp,
+      'X-TIM-Signature': signature,
+    },
+    body,
+  });
+
+  const text = await response.text();
+  const result = text ? JSON.parse(text) : {};
+  if (!response.ok) {
+    throw new Error(result.error || `deviceAgentBridge ${action} failed with HTTP ${response.status}`);
+  }
+  return result.data;
+}
+
+async function publishEvent(config, event) {
   try {
-    await base44.entities.DeviceEvent.create(event);
+    await bridgeRequest(config, 'createDeviceEvent', event);
   } catch (error) {
     console.warn(`TIM event write failed: ${error.message}`);
   }
 }
 
 export async function runAgent(config, signal) {
-  if (!config.token) throw new Error('TIM_BASE44_ACCESS_TOKEN is required for connected mode');
   if (!config.commandSecret) throw new Error('TIM_COMMAND_SIGNING_SECRET is required for connected mode');
-  const base44 = createClient({
-    appId: config.appId,
-    serverUrl: config.serverUrl,
-    token: config.token,
-    requiresAuth: true,
-  });
   const capabilities = await discoverCapabilities(config);
   const platformName = process.platform === 'win32' ? 'windows' : process.platform === 'darwin' ? 'macos' : 'linux';
-  const nodes = await base44.entities.DeviceNode.filter({ node_id: config.nodeId });
+  const existingNode = await bridgeRequest(config, 'getDeviceNode', { node_id: config.nodeId });
   const nodeData = {
     node_id: config.nodeId,
     display_name: config.displayName,
@@ -37,19 +59,19 @@ export async function runAgent(config, signal) {
     hostname: os.hostname(),
     last_seen: new Date().toISOString(),
   };
-  const node = nodes[0]
-    ? await base44.entities.DeviceNode.update(nodes[0].id, nodeData)
-    : await base44.entities.DeviceNode.create({ ...nodeData, paired_at: new Date().toISOString() });
+  const node = existingNode
+    ? await bridgeRequest(config, 'updateDeviceNode', { id: existingNode.id, ...nodeData })
+    : await bridgeRequest(config, 'createDeviceNode', { ...nodeData, paired_at: new Date().toISOString() });
 
   console.log(`TIM edge agent online as ${config.nodeId} (${capabilities.join(', ')})`);
   while (!signal.aborted) {
-    await base44.entities.DeviceNode.update(node.id, { status: 'online', last_seen: new Date().toISOString(), capabilities });
-    const queued = await base44.entities.DeviceCommand.filter({ node_id: config.nodeId, status: 'queued' });
+    await bridgeRequest(config, 'updateDeviceNode', { id: node.id, status: 'online', last_seen: new Date().toISOString(), capabilities });
+    const queued = await bridgeRequest(config, 'listPendingCommands', { node_id: config.nodeId });
     for (const command of queued) {
       const now = new Date();
       if (!verifyCommandAuthorization(command, config.commandSecret)) {
-        await base44.entities.DeviceCommand.update(command.id, { status: 'failed', error: 'Command signature is missing or invalid', completed_at: now.toISOString() });
-        await publishEvent(base44, {
+        await bridgeRequest(config, 'updateDeviceCommand', { id: command.id, status: 'failed', error: 'Command signature is missing or invalid', completed_at: now.toISOString() });
+        await publishEvent(config, {
           node_id: config.nodeId,
           command_id: command.command_id,
           event_type: 'command.rejected',
@@ -61,20 +83,20 @@ export async function runAgent(config, signal) {
         continue;
       }
       if (command.expires_at && new Date(command.expires_at) <= now) {
-        await base44.entities.DeviceCommand.update(command.id, { status: 'expired', completed_at: now.toISOString() });
+        await bridgeRequest(config, 'updateDeviceCommand', { id: command.id, status: 'expired', completed_at: now.toISOString() });
         continue;
       }
       if (command.requires_approval && !command.approved_at) {
-        await base44.entities.DeviceCommand.update(command.id, { status: 'failed', error: 'Approval record is missing' });
+        await bridgeRequest(config, 'updateDeviceCommand', { id: command.id, status: 'failed', error: 'Approval record is missing' });
         continue;
       }
 
-      await base44.entities.DeviceCommand.update(command.id, { status: 'running', started_at: now.toISOString() });
+      await bridgeRequest(config, 'updateDeviceCommand', { id: command.id, status: 'running', started_at: now.toISOString() });
       try {
         const result = await executeCommand(command, { config, approved: !command.requires_approval || Boolean(command.approved_at) });
         const completedAt = new Date().toISOString();
-        await base44.entities.DeviceCommand.update(command.id, { status: 'succeeded', result, completed_at: completedAt });
-        await publishEvent(base44, {
+        await bridgeRequest(config, 'updateDeviceCommand', { id: command.id, status: 'succeeded', result, completed_at: completedAt });
+        await publishEvent(config, {
           node_id: config.nodeId,
           command_id: command.command_id,
           event_type: 'command.succeeded',
@@ -85,13 +107,14 @@ export async function runAgent(config, signal) {
         });
       } catch (error) {
         const completedAt = new Date().toISOString();
-        await base44.entities.DeviceCommand.update(command.id, {
+        await bridgeRequest(config, 'updateDeviceCommand', {
+          id: command.id,
           status: 'failed',
           error: error.message,
           result: error.result || {},
           completed_at: completedAt,
         });
-        await publishEvent(base44, {
+        await publishEvent(config, {
           node_id: config.nodeId,
           command_id: command.command_id,
           event_type: 'command.failed',
@@ -104,5 +127,5 @@ export async function runAgent(config, signal) {
     }
     await delay(config.pollIntervalMs);
   }
-  await base44.entities.DeviceNode.update(node.id, { status: 'offline', last_seen: new Date().toISOString() });
+  await bridgeRequest(config, 'updateDeviceNode', { id: node.id, status: 'offline', last_seen: new Date().toISOString() });
 }
