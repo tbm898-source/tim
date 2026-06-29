@@ -44,6 +44,7 @@ export default function AssetForm() {
     purchase_price: '',
     replacement_value: '',
     photo: '',
+    clickup_task_id: '',
   });
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
@@ -89,6 +90,7 @@ export default function AssetForm() {
         purchase_price: asset.purchase_price != null ? String(asset.purchase_price) : '',
         replacement_value: asset.replacement_value != null ? String(asset.replacement_value) : '',
         photo: asset.photo || asset.image_url || '',
+        clickup_task_id: asset.clickup_task_id || '',
       });
     } catch (err) {
       setErrors({ _global: err.message || 'Failed to load asset for editing' });
@@ -167,6 +169,7 @@ export default function AssetForm() {
         purchase_price: form.purchase_price ? parseFloat(form.purchase_price) : undefined,
         replacement_value: form.replacement_value ? parseFloat(form.replacement_value) : undefined,
         photo: form.photo || undefined,
+        clickup_task_id: form.clickup_task_id || undefined,
         status: editingAsset?.status || 'available',
         created_by_email: editingAsset?.created_by_email || user?.email || '',
         // legacy compat
@@ -223,7 +226,7 @@ export default function AssetForm() {
                     className="border-gray-600 text-white hover:bg-gray-700 w-full"
                     onClick={() => {
                       setSuccess(null);
-                      setForm({ name: '', category: '', description: '', manufacturer: '', model: '', serial_number: '', condition: 'good', location: '', notes: '', purchase_date: '', purchase_price: '', replacement_value: '', photo: '' });
+                      setForm({ name: '', category: '', description: '', manufacturer: '', model: '', serial_number: '', condition: 'good', location: '', notes: '', purchase_date: '', purchase_price: '', replacement_value: '', photo: '', clickup_task_id: '' });
                       setSerialWarning(false);
                       setSerialConfirmed(false);
                     }}
@@ -436,6 +439,26 @@ export default function AssetForm() {
                   placeholder="0.00"
                   className="bg-gray-900 border-gray-600 text-white"
                 />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* ClickUp Integration */}
+          <Card className="bg-gray-800 border-gray-700">
+            <CardHeader><CardTitle className="text-white text-lg flex items-center gap-2">ClickUp Integration <span className="text-xs font-normal text-gray-400">(optional)</span></CardTitle></CardHeader>
+            <CardContent>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">ClickUp Task ID</label>
+                <Input
+                  value={form.clickup_task_id}
+                  onChange={e => set('clickup_task_id', e.target.value)}
+                  placeholder="e.g. 8abc12345"
+                  className="bg-gray-900 border-gray-600 text-white font-mono"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  When linked, asset status changes will automatically update this ClickUp task.
+                  Find the task ID in the ClickUp task URL: app.clickup.com/t/<strong>TASK_ID</strong>
+                </p>
               </div>
             </CardContent>
           </Card>

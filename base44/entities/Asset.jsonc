@@ -112,6 +112,10 @@
       "type": "string",
       "description": "Email of user who created this asset"
     },
+    "clickup_task_id": {
+      "type": "string",
+      "description": "Linked ClickUp task ID for status sync"
+    },
     "asset_tag": {
       "type": "string",
       "description": "Legacy asset tag field (kept for backward compatibility)"
