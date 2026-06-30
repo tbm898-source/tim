@@ -2,7 +2,9 @@
 import { readFile } from 'node:fs/promises';
 import { loadAgentConfig } from './lib/config.mjs';
 import { discoverCapabilities, executeCommand } from './lib/dispatcher.mjs';
+import { loadAgentEnvFile } from './lib/load-env.mjs';
 
+loadAgentEnvFile();
 const config = loadAgentConfig();
 const [mode = 'capabilities', ...args] = process.argv.slice(2);
 
