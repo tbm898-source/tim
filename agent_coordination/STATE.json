@@ -1,6 +1,6 @@
 {
   "schema": "tim-agent-coordination/v1",
-  "updated_at": "2026-07-07T04:00:00Z",
+  "updated_at": "2026-07-07T04:05:00Z",
   "holder": "codex",
   "host": "dhd-admin",
   "active_task": "agent_coordination layer + edge agent ops",
@@ -9,6 +9,17 @@
     "agent_coordination/**",
     "logs/**"
   ],
-  "note": "Codex on DHD-Admin. Cursor: Mac frontend/Base44 only after pull. Merge coordination docs here via git.",
-  "expires_at": null
+  "note": "Cursor pinged via INBOX.md + Base44 event. Codex: git pull origin main, reply in INBOX.md, update this file when acked.",
+  "expires_at": null,
+  "peers": {
+    "cursor": {
+      "host": "macbook-air",
+      "last_contact": "2026-07-07T04:05:00Z",
+      "channel": "git+base44"
+    },
+    "codex": {
+      "host": "dhd-admin",
+      "expected_action": "git pull, ack INBOX.md"
+    }
+  }
 }
