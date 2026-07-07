@@ -28,3 +28,7 @@ npm run agent:health
 ## Exit node warning
 
 Do not use **goliathsystem** as an exit node unless it is online. An offline exit node black-holes all internet on Windows.
+
+## Multi-agent coordination
+
+Before starting work, read [`agent_coordination/`](../agent_coordination/) — `STATE.json` and `ROLES.md` define who owns which paths.

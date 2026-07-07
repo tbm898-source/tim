@@ -1,5 +1,7 @@
 # AGENTS.md — Base44 App Context for OpenAI Codex CLI
 
+> **Multi-agent coordination:** read [`agent_coordination/`](../agent_coordination/) first (`STATE.json`, `ROLES.md`).
+
 ## Project Overview
 This is a **Base44** platform application built with **React + Vite + Tailwind CSS + TypeScript**.
 It is a multi-domain management suite covering:

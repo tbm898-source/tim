@@ -1,0 +1,14 @@
+{
+  "schema": "tim-agent-coordination/v1",
+  "updated_at": "2026-07-07T04:00:00Z",
+  "holder": "codex",
+  "host": "dhd-admin",
+  "active_task": "agent_coordination layer + edge agent ops",
+  "locks": [
+    "agent/**",
+    "agent_coordination/**",
+    "logs/**"
+  ],
+  "note": "Codex on DHD-Admin. Cursor: Mac frontend/Base44 only after pull. Merge coordination docs here via git.",
+  "expires_at": null
+}
