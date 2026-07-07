@@ -14,6 +14,20 @@ npm run agent:capabilities
 
 Set values in the host environment or in a local `.env` mechanism managed outside this repository. Never commit the signing secret.
 
+**Remote setup from Mac (Dropbox sync):** `agent/.env.dhd-admin` syncs to the Windows checkout. On DHD-ADMIN, run once:
+
+```powershell
+cd "C:\Users\Tim Milkewicz\Dropbox\CANONICAL\30_CODE\tim"
+powershell -ExecutionPolicy Bypass -File agent\run-dhd-admin.ps1
+```
+
+Optional autostart at logon:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File agent\install-dhd-admin-autostart.ps1
+Start-ScheduledTask -TaskName 'TIM-Edge-Agent-dhd-admin'
+```
+
 ```powershell
 $env:TIM_NODE_ID = 'tim-office-windows'
 $env:TIM_NODE_NAME = 'Office Windows PC'
@@ -65,3 +79,18 @@ Consequential local tests such as `android.build`, `android.install`, `app.launc
 Configure `TIM_COMMAND_SIGNING_SECRET` as a protected Base44 function secret and separately on every trusted agent. The agent rejects any command whose signature is missing or does not match its payload, approval timestamp, node, risk, and expiry.
 
 The agent uses the HMAC-protected `deviceAgentBridge` function for connected mode, so it does not need a Base44 user access token on the trusted host. Before exposing the control plane beyond a private test environment, replace shared-secret provisioning with one-time pairing and device-scoped, revocable credentials.
+
+## Windows Tailnet recovery (DHD-Admin offline)
+
+If `dhd-admin` or other Windows nodes show **offline** in `tailscale status` from the Mac, do not edit this repo on Windows until Tailscale is healthy again (Dropbox conflict copies are the usual symptom).
+
+On the Windows host (local console or RDP, not over Tailscale):
+
+1. Open the Tailscale app — confirm **Connected** (re-login if needed).
+2. Tray icon → **Use exit node** → **None** if `goliathsystem` or another exit node is offline (offline exit nodes can kill all internet on Windows).
+3. Admin PowerShell: `Restart-Service Tailscale`
+4. Confirm normal internet works outside Tailscale, then confirm Tailscale shows Connected.
+
+From the Mac, verify: `tailscale ping dhd-admin` (should reply). Only then run `agent\run-dhd-admin.ps1` again.
+
+**Mac-only workflow until then:** commit and push from the Mac checkout; leave DHD-Admin idle.
