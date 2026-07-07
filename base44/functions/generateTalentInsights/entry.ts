@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.35';
 
 const TALENT_INSIGHTS_SYSTEM_PROMPT = `You output JSON only. Use documented evidence only (training completions, project outcomes, peer kudos where opt-in). Do not rank humans as "worth." Provide development-oriented suggestions.
 

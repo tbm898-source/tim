@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.35';
 
 const INTEGRITY_MONITOR_SYSTEM_PROMPT = `You output JSON only. Do not accuse individuals. Do not infer motives. Describe observable patterns and policy mismatches. Cite evidence IDs and timestamps.
 

@@ -1,21 +1,25 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import { Bot, MonitorSmartphone, Wrench, ShieldCheck, Settings, BarChart3, Users } from 'lucide-react';
+import { DESKTOP_NAV_ITEMS } from '@/nav.config';
 
-const navItems = [
-  { name: 'TIM', path: '/', icon: Bot },
-  { name: 'Devices', path: '/Devices', icon: MonitorSmartphone },
-  { name: 'Dashboard', path: '/Dashboard', icon: BarChart3 },
-  { name: 'Assets', path: '/AssetManagement', icon: Wrench },
-  { name: 'Integrity', path: '/IntegrityMonitoring', icon: ShieldCheck },
-  { name: 'Talent', path: '/TalentInsights', icon: Users },
-  { name: 'Settings', path: '/UserSettings', icon: Settings },
-];
+const ICONS = {
+  SETH: Bot,
+  Devices: MonitorSmartphone,
+  Dashboard: BarChart3,
+  AssetManagement: Wrench,
+  IntegrityMonitoring: ShieldCheck,
+  TalentInsights: Users,
+  UserSettings: Settings,
+};
 
 export default function TopNav() {
   const location = useLocation();
 
-  const isActive = (path) => {
+  const isActive = (item) => {
+    const path = item.path || createPageUrl(item.page);
+    if (item.alsoActive?.includes(location.pathname)) return true;
     if (path === '/') return location.pathname === '/' || location.pathname === '/SETH';
     return location.pathname === path;
   };
@@ -29,13 +33,14 @@ export default function TopNav() {
           </div>
           <span className="text-lg font-bold text-cyan-300 tracking-wider">TIM</span>
         </Link>
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const active = isActive(item.path);
+        {DESKTOP_NAV_ITEMS.map((item) => {
+          const Icon = ICONS[item.page];
+          const path = item.path || createPageUrl(item.page);
+          const active = isActive(item);
           return (
             <Link
               key={item.name}
-              to={item.path}
+              to={path}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 active
                   ? 'bg-cyan-400/10 text-cyan-300'

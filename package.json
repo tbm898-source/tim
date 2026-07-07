@@ -11,8 +11,10 @@
     "typecheck": "tsc -p ./jsconfig.json",
     "preview": "vite preview",
     "agent:capabilities": "node agent/tim-edge.mjs capabilities",
+    "agent:health": "node agent/health-check.mjs",
     "agent:run": "node agent/tim-edge.mjs run",
-    "agent:test": "node --test agent/tests/*.test.mjs"
+    "agent:test": "node --test agent/tests/*.test.mjs",
+    "check": "npm run agent:test && npm run build"
   },
   "dependencies": {
     "@base44/sdk": "^0.8.35",

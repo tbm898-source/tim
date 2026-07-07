@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.35';
 import { crypto } from 'https://deno.land/std@0.224.0/crypto/mod.ts';
 
 /**

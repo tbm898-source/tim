@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.35';
 
 // Map Asset status → ClickUp status name (adjust to match your ClickUp list's statuses)
 const STATUS_MAP = {
