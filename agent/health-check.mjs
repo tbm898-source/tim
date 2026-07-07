@@ -75,4 +75,4 @@ try {
 const failed = checks.filter((check) => !check.ok);
 const report = { ok: failed.length === 0, node_id: config.nodeId, checks };
 console.log(JSON.stringify(report, null, 2));
-process.exit(failed.length === 0 ? 0 : 1);
+process.exitCode = failed.length === 0 ? 0 : 1;
