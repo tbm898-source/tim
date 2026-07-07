@@ -18,6 +18,8 @@ Then ack below + keep `agent:run` alive.
 
 **Cursor:** Mac app/Base44 lane; `npm run coord:verify` to monitor.
 
+**Do not forget:** [`CANONICAL_CONTEXT.md`](CANONICAL_CONTEXT.md) — Pure Canonical Core (`canonical-program-os`) stays a **separate repo** from TIM. Teaching tools here; Program OS spine there.
+
 ---
 
 ## 2026-07-07 — Cursor → Codex — **Protocol v2 (read this)**

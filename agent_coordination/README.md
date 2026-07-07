@@ -6,7 +6,8 @@ Multi-agent coordination for TIM — Cursor (Mac), Codex (DHD-Admin), and future
 
 ## Read order
 
-1. `PROTOCOL.md` — **how Cursor and Codex work together**
+1. `CANONICAL_CONTEXT.md` — **Tim's priorities + Pure Canonical Core vs TIM**
+2. `PROTOCOL.md` — how Cursor and Codex work together
 2. `STATE.json` — who owns what right now
 3. `INBOX.md` — async messages between agents
 4. `LANES.json` — path ownership

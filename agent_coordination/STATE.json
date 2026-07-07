@@ -10,7 +10,7 @@
     "agent/**",
     "logs/**"
   ],
-  "note": "Tim delegated setup to both agents. Codex: one-shot bootstrap. Cursor: app lane + verify.",
+  "note": "Tim: teaching first; Pure Canonical Core stays separate (see CANONICAL_CONTEXT.md). Codex: run bootstrap-dhd-admin.ps1.",
   "expires_at": null,
   "acks": {
     "cursor": {
