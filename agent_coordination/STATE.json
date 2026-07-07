@@ -10,7 +10,7 @@
     "agent/**",
     "logs/**"
   ],
-  "note": "Shared protocol v2 landed. Codex: read CODEX_START.md, run coord:check-in, ack in INBOX + acks.codex. Cursor lane: src/base44/docs.",
+  "note": "SSH: Cursor pub in ssh/keys; Codex must run install-on-dhd-admin.ps1. Then Mac can ssh dhd-admin.",
   "expires_at": null,
   "acks": {
     "cursor": {

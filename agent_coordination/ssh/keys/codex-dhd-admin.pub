@@ -1,0 +1,2 @@
+# Placeholder — Codex generates on DHD-Admin and replaces this file.
+# ssh-keygen -t ed25519 -f $env:USERPROFILE\.ssh\id_ed25519_tim_agent -C "tim-agent-codex@dhd-admin" -N '""'

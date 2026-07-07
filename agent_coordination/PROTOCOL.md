@@ -98,3 +98,12 @@ Append `INBOX.md` with tag **`[NEEDS TIM]`** when:
 - Base44 deploy or secrets needed
 - Agent offline > 15 min during critical work
 - Git push blocked / merge conflict on `main`
+
+## SSH between agents (Tailscale)
+
+1. **Public keys only in git:** `agent_coordination/ssh/keys/*.pub`
+2. **Codex on DHD-Admin:** `install-on-dhd-admin.ps1` (adds Mac key, starts sshd, generates Codex key)
+3. **Cursor on Mac:** `install-on-mac.sh` (ssh config + optional reverse key)
+4. **Test:** `ssh dhd-admin hostname`
+
+Private keys stay on each host (`~/.ssh/`). Never commit them.
