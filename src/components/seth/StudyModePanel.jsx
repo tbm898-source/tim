@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, Brain, Lightbulb, FileText } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { BookOpen, Brain, CheckCircle, XCircle, Lightbulb, FileText } from 'lucide-react';
 
 export default function StudyModePanel({ onGenerateQuiz, onGenerateStudyPlan, onExplainConcept, onSummarize }) {
   const [selectedAction, setSelectedAction] = useState(null);

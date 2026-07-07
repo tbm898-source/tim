@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, Send, BookOpen, Lightbulb } from 'lucide-react';
+import { Loader2, Send, BookOpen, Lightbulb, HelpCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function StudyAssistant() {

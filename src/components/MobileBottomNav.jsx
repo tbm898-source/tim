@@ -1,20 +1,20 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Bot, MonitorSmartphone, Wrench, ShieldCheck } from 'lucide-react';
+import { createPageUrl } from '@/utils';
+import { Home, QrCode, Bot, Award } from 'lucide-react';
 
 export default function MobileBottomNav() {
   const location = useLocation();
   
   const isActive = (path) => {
-    if (path === '/') return location.pathname === '/' || location.pathname === '/SETH';
     return location.pathname === path;
   };
 
   const navItems = [
-    { name: 'TIM', path: '/', icon: Bot },
-    { name: 'Devices', path: '/Devices', icon: MonitorSmartphone },
-    { name: 'Systems', path: '/AssetManagement', icon: Wrench },
-    { name: 'Integrity', path: '/IntegrityMonitoring', icon: ShieldCheck },
+    { name: 'Dashboard', path: createPageUrl('Dashboard'), icon: Home },
+    { name: 'Scanner', path: createPageUrl('AssetScanner'), icon: QrCode },
+    { name: 'SETH', path: createPageUrl('SETH'), icon: Bot },
+    { name: 'Achievements', path: createPageUrl('Achievements'), icon: Award },
   ];
 
   return (

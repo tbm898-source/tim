@@ -21,15 +21,6 @@ export const AuthProvider = ({ children }) => {
     try {
       setIsLoadingPublicSettings(true);
       setAuthError(null);
-
-      if (appParams.isPreviewMode) {
-        setAppPublicSettings({ id: appParams.appId || 'local-preview', public_settings: {} });
-        setUser({ id: 'local-preview', email: 'preview@tim.local', role: 'admin', full_name: 'Local Preview' });
-        setIsAuthenticated(true);
-        setIsLoadingPublicSettings(false);
-        setIsLoadingAuth(false);
-        return;
-      }
       
       // First, check app public settings (with token if available)
       // This will tell us if auth is required, user not registered, etc.
@@ -133,7 +124,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   const navigateToLogin = () => {
-    if (appParams.isPreviewMode) return;
     // Use the SDK's redirectToLogin method
     base44.auth.redirectToLogin(window.location.href);
   };

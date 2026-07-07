@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AlertTriangle, Package, Search, ShoppingCart, TrendingDown } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 
 export default function PartsInventoryManager({ parts, onUpdate }) {
   const [searchTerm, setSearchTerm] = useState('');
