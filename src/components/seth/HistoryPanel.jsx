@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { base44 } from "@/api/base44Client";
+import { ChatSession } from "@/entities/ChatSession";
 import { X, Plus, MessageSquare, Loader2 } from "lucide-react";
-
-const { ChatSession } = base44.entities;
 
 export default function HistoryPanel({ onNewChat, onLoadSession, onClose }) {
     const [sessions, setSessions] = useState([]);

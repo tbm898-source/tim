@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Wrench, QrCode } from 'lucide-react';
+import { Clock, Wrench, CheckCircle, AlertCircle, Download, QrCode } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import QRCodeGenerator from './QRCodeGenerator';
 

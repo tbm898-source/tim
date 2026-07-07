@@ -27,7 +27,15 @@ async function bridgeRequest(config, action, payload = {}) {
   });
 
   const text = await response.text();
-  const result = text ? JSON.parse(text) : {};
+  let result = {};
+  if (text) {
+    try {
+      result = JSON.parse(text);
+    } catch {
+      const preview = text.trimStart().slice(0, 40).replace(/\s+/g, ' ');
+      throw new Error(`deviceAgentBridge ${action} returned non-JSON (HTTP ${response.status}): ${preview}`);
+    }
+  }
   if (!response.ok) {
     throw new Error(result.error || `deviceAgentBridge ${action} failed with HTTP ${response.status}`);
   }
@@ -65,9 +73,10 @@ export async function runAgent(config, signal) {
 
   console.log(`TIM edge agent online as ${config.nodeId} (${capabilities.join(', ')})`);
   while (!signal.aborted) {
-    await bridgeRequest(config, 'updateDeviceNode', { id: node.id, status: 'online', last_seen: new Date().toISOString(), capabilities });
-    const queued = await bridgeRequest(config, 'listPendingCommands', { node_id: config.nodeId });
-    for (const command of queued) {
+    try {
+      await bridgeRequest(config, 'updateDeviceNode', { id: node.id, status: 'online', last_seen: new Date().toISOString(), capabilities });
+      const queued = await bridgeRequest(config, 'listPendingCommands', { node_id: config.nodeId });
+      for (const command of queued) {
       const now = new Date();
       if (!verifyCommandAuthorization(command, config.commandSecret)) {
         await bridgeRequest(config, 'updateDeviceCommand', { id: command.id, status: 'failed', error: 'Command signature is missing or invalid', completed_at: now.toISOString() });
@@ -124,6 +133,9 @@ export async function runAgent(config, signal) {
           occurred_at: completedAt,
         });
       }
+      }
+    } catch (error) {
+      console.warn(`TIM bridge poll failed: ${error.message}`);
     }
     await delay(config.pollIntervalMs);
   }

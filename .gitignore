@@ -1,6 +1,7 @@
 #env
 .env
 .env.*
+agent/.env
 
 # Logs
 logs
@@ -26,5 +27,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Dropbox sync conflict copies
+*conflicted copy*
 
 .env
