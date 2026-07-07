@@ -80,17 +80,33 @@ Configure `TIM_COMMAND_SIGNING_SECRET` as a protected Base44 function secret and
 
 The agent uses the HMAC-protected `deviceAgentBridge` function for connected mode, so it does not need a Base44 user access token on the trusted host. Before exposing the control plane beyond a private test environment, replace shared-secret provisioning with one-time pairing and device-scoped, revocable credentials.
 
-## Windows Tailnet recovery (DHD-Admin offline)
+## Windows Tailnet / internet recovery
 
-If `dhd-admin` or other Windows nodes show **offline** in `tailscale status` from the Mac, do not edit this repo on Windows until Tailscale is healthy again (Dropbox conflict copies are the usual symptom).
+**Symptom:** Windows PCs (`DHD-Admin`, `DESKTOP-HN4P1BS`, etc.) cannot reach the internet for many apps (browser, npm, git, Base44) even though Wi‑Fi looks connected.
 
-On the Windows host (local console or RDP, not over Tailscale):
+**Most common cause:** Exit node set to **`goliathsystem`**, which advertises `0.0.0.0/0` but is **offline**. Windows sends traffic to a dead gateway.
 
-1. Open the Tailscale app — confirm **Connected** (re-login if needed).
-2. Tray icon → **Use exit node** → **None** if `goliathsystem` or another exit node is offline (offline exit nodes can kill all internet on Windows).
-3. Admin PowerShell: `Restart-Service Tailscale`
-4. Confirm normal internet works outside Tailscale, then confirm Tailscale shows Connected.
+### Fix (run on each affected Windows PC)
 
-From the Mac, verify: `tailscale ping dhd-admin` (should reply). Only then run `agent\run-dhd-admin.ps1` again.
+Open **Admin PowerShell** locally (not over Tailscale):
 
-**Mac-only workflow until then:** commit and push from the Mac checkout; leave DHD-Admin idle.
+```powershell
+cd "C:\Users\Tim Milkewicz\Dropbox\CANONICAL\30_CODE\tim"
+powershell -ExecutionPolicy Bypass -File agent\fix-windows-tailnet.ps1
+```
+
+Or manually:
+
+1. Tailscale tray → **Use exit node** → **None**
+2. `tailscale set --exit-node=`
+3. `tailscale set --accept-dns=false` (test with system DNS first)
+4. `Restart-Service Tailscale`
+5. Test: `Test-NetConnection google.com -Port 443`
+
+From the Mac, verify: `tailscale ping dhd-admin` and `tailscale ping desktop-hn4p1bs`.
+
+**Only after internet works:** `git pull origin main`, then `agent\run-dhd-admin.ps1`.
+
+Do not edit this repo on Windows until Tailscale is healthy (Dropbox conflict copies).
+
+**Mac-only workflow during outages:** commit and push from the Mac checkout.
