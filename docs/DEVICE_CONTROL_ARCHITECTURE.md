@@ -7,6 +7,8 @@ TIM is split into two deliberately different parts:
 1. The Base44 app is the control plane: device inventory, requests, approvals, status, and audit history.
 2. A TIM edge agent runs on each trusted computer and performs a small set of locally allowlisted actions.
 
+Osiris Rising can observe TIM through a narrow connector contract, but it does not become the device executor. Consequential commands still flow through TIM's Base44 ledger, approval step, command signing, and edge-agent verification.
+
 This makes the system useful without turning the web application into an unaudited remote shell.
 
 ```text
@@ -64,6 +66,46 @@ There is no `shell.exec`, arbitrary executable path, arbitrary command argument 
 8. Repeat on a Mac for Xcode and a small Shortcuts allowlist.
 
 The repository owner must perform or authorize Base44 publication. This checkout cannot publish to GitHub because the authenticated account currently has read-only repository access.
+
+## Integration handoff — 2026-06-27
+
+| Field | Value |
+|---|---|
+| Machine used | MacBook Air (Eugene, Space Bar) via Tailscale |
+| Mac checkout | `/Users/timmi/Library/CloudStorage/Dropbox/CANONICAL/30_CODE/tim` |
+| Authoritative repo | `https://github.com/tbm898-source/tim.git` branch `main` |
+| Base44 app ID | `695cfbf7fba07f58d25ff8bb` |
+| Bridge endpoint pattern | `https://base44.app/api/apps/695cfbf7fba07f58d25ff8bb/functions/deviceAgentBridge` |
+| Agent auth | `TIM_COMMAND_SIGNING_SECRET` HMAC on `timestamp.body` via `X-TIM-Timestamp` + `X-TIM-Signature` |
+| Legacy token | `TIM_BASE44_ACCESS_TOKEN` not used by connected agent mode |
+
+### Verified from Mac
+
+- Tailscale: `dhd-admin` (`100.95.71.54`) online, `goliathsystem` (`100.113.126.122`) online
+- SSH Mac → DHD-ADMIN: blocked (Mac public key not in DHD-ADMIN `authorized_keys`)
+- SSH Mac → goliathserver: blocked (`timmi` rejected)
+- Mac agent capabilities: runnable locally via `npm run agent:capabilities`
+
+### Files added or updated in this slice
+
+- `base44/functions/deviceAgentBridge/entry.ts` — signed bridge for edge agents
+- `base44/entities/DeviceNode.jsonc`, `DeviceCommand.jsonc`, `DeviceEvent.jsonc`
+- `base44/functions/queueDeviceCommand/entry.ts`, `approveDeviceCommand/entry.ts`
+- `agent/` edge agent, `src/pages/Devices.jsx`, `src/api/entities.js`
+- `agent/tests/bridge-signature.test.mjs`
+
+### Remaining blockers
+
+1. Add Mac SSH public key to DHD-ADMIN `authorized_keys` (manual RDP step)
+2. Configure `TIM_COMMAND_SIGNING_SECRET` in Base44 function secrets and on DHD-ADMIN agent host
+3. Deploy updated Base44 functions and entities from this checkout
+4. Start agent on DHD-ADMIN with `TIM_NODE_ID=dhd-admin` and verify node appears in `/Devices`
+
+### Rollback
+
+- Remove `base44/functions/deviceAgentBridge/`
+- Stop the edge agent process on DHD-ADMIN
+- Delete test `DeviceNode` records for `dhd-admin` from Base44 if duplicates were created during testing
 
 ## Production hardening backlog
 
