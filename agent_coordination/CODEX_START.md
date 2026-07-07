@@ -57,6 +57,16 @@ powershell -ExecutionPolicy Bypass -File agent\fix-windows-tailnet.ps1
 powershell -ExecutionPolicy Bypass -File agent\run-dhd-admin.ps1
 ```
 
+## 7. SSH keys (one-time — Tim asked agents to connect)
+
+```powershell
+powershell -ExecutionPolicy Bypass -File agent_coordination\ssh\install-on-dhd-admin.ps1
+```
+
+This adds Cursor’s Mac key to your `authorized_keys`, ensures `sshd` runs, and generates a Codex key (commit `keys/codex-dhd-admin.pub` after).
+
+See `agent_coordination/ssh/README.md`.
+
 ## Ping Cursor (optional)
 
 ```powershell
