@@ -1,6 +1,6 @@
 # AGENTS.md — Base44 App Context for OpenAI Codex CLI
 
-> **Multi-agent coordination:** read [`agent_coordination/`](../agent_coordination/) first (`STATE.json`, `ROLES.md`).
+> **Multi-agent coordination:** read [`agent_coordination/`](../agent_coordination/) first — **`PROTOCOL.md`**, `CODEX_START.md` (you), `STATE.json`, `INBOX.md`. Run `npm run coord:check-in -- --agent codex` every session.
 
 ## Project Overview
 This is a **Base44** platform application built with **React + Vite + Tailwind CSS + TypeScript**.

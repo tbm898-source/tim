@@ -14,6 +14,7 @@
     "agent:health": "node agent/health-check.mjs",
     "agent:run": "node agent/tim-edge.mjs run",
     "agent:test": "node --test agent/tests/*.test.mjs",
+    "coord:check-in": "node agent_coordination/check-in.mjs",
     "check": "npm run agent:test && npm run build"
   },
   "dependencies": {

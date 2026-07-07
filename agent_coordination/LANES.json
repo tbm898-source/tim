@@ -1,0 +1,49 @@
+{
+  "schema": "tim-agent-lanes/v1",
+  "cursor": {
+    "host": "macbook-air",
+    "paths": [
+      "src/**",
+      "base44/**",
+      "docs/**",
+      ".github/**",
+      "index.html",
+      "jsconfig.json"
+    ],
+    "responsibilities": [
+      "Frontend and Base44 function source",
+      "CI and nav config",
+      "Git commit and push to main",
+      "PR creation and merge"
+    ]
+  },
+  "codex": {
+    "host": "dhd-admin",
+    "paths": [
+      "agent/**",
+      "logs/**"
+    ],
+    "responsibilities": [
+      "Edge agent run and Windows autostart",
+      "Tailnet recovery (fix-windows-tailnet.ps1)",
+      "Agent health and bridge testing on Windows",
+      "Local `.env` on DHD-Admin (never commit secrets)"
+    ]
+  },
+  "shared": {
+    "paths": [
+      "agent_coordination/**",
+      "README.md",
+      "package.json",
+      "package-lock.json"
+    ],
+    "rule": "git pull first; update STATE.json; one editor at a time; commit within the same session"
+  },
+  "human_only": {
+    "paths": [
+      "agent/.env",
+      "agent/.env.dhd-admin"
+    ],
+    "rule": "secrets — never commit; Tim or explicit handoff only"
+  }
+}
