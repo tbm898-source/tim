@@ -1,27 +1,27 @@
 {
   "schema": "tim-agent-coordination/v2",
   "protocol_version": 2,
-  "updated_at": "2026-07-07T04:10:00Z",
+  "updated_at": "2026-07-07T04:20:00Z",
   "updated_by": "cursor",
   "holder": "codex",
   "host": "dhd-admin",
-  "active_task": "Ack protocol v2; keep edge agent healthy",
+  "active_task": "Run bootstrap-dhd-admin.ps1; ack INBOX; keep agent online",
   "locks": [
     "agent/**",
     "logs/**"
   ],
-  "note": "SSH: Cursor pub in ssh/keys; Codex must run install-on-dhd-admin.ps1. Then Mac can ssh dhd-admin.",
+  "note": "Tim delegated setup to both agents. Codex: one-shot bootstrap. Cursor: app lane + verify.",
   "expires_at": null,
   "acks": {
     "cursor": {
-      "at": "2026-07-07T04:10:00Z",
-      "commit": "pending-push",
-      "note": "Published PROTOCOL v2, LANES, check-in, CODEX_START"
+      "at": "2026-07-07T04:20:00Z",
+      "commit": "f878aa1",
+      "note": "protocol v2, SSH pub, bootstrap script, coord:verify; agent online via bridge"
     },
     "codex": {
       "at": null,
       "commit": null,
-      "note": "REQUIRED: git pull, read CODEX_START.md, reply in INBOX.md"
+      "note": "Run agent_coordination/bootstrap-dhd-admin.ps1 then ack here"
     }
   },
   "queue": []

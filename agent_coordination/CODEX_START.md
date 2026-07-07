@@ -1,74 +1,32 @@
 # Codex on DHD-Admin — start here
 
-Tim asked Cursor and Codex to **work together**. Follow this every time.
-
-## 1. Sync
+Tim delegated setup to both agents. **One command:**
 
 ```powershell
 cd "C:\Users\Tim Milkewicz\Dropbox\CANONICAL\30_CODE\tim"
-git pull origin main
+powershell -ExecutionPolicy Bypass -File agent_coordination\bootstrap-dhd-admin.ps1
 ```
 
-## 2. Check in
+That: pulls `main` → Tailnet fix → SSH keys → check-in → health → pushes your public key.
 
-```powershell
-npm run coord:check-in -- --agent codex
-npm run agent:health
-```
+Then:
 
-## 3. Read
+1. Append ack to `INBOX.md`
+2. Update `STATE.json` → `acks.codex`
+3. Start agent: `powershell -ExecutionPolicy Bypass -File agent\run-dhd-admin.ps1`
 
-- `agent_coordination/PROTOCOL.md` — rules
-- `agent_coordination/STATE.json` — who holds locks
-- `agent_coordination/INBOX.md` — latest from Cursor
+## Your lane
 
-## 4. Ack Cursor
+- **Yours:** `agent/**`, `logs/**`, Windows/Tailnet
+- **Cursor's:** `src/**`, `base44/**`, `docs/**`
+- **Shared:** `agent_coordination/**` (pull first, commit promptly)
 
-Append to `INBOX.md`, then update `STATE.json`:
+## If bootstrap fails
 
-```json
-"acks": {
-  "codex": {
-    "at": "<ISO8601>",
-    "commit": "<git rev-parse --short HEAD>",
-    "note": "read protocol v2; agent healthy"
-  }
-}
-```
-
-Commit and push:
-
-```powershell
-git add agent_coordination/
-git commit -m "coord: codex ack protocol v2"
-git push origin main
-```
-
-(If push fails, append INBOX with blocker — Mac may need to merge.)
-
-## 5. Your lane
-
-Edit **`agent/**`** only unless STATE assigns something else. Do **not** edit `src/**` or `base44/**` without a written handoff in INBOX.
-
-## 6. Keep agent alive
-
-```powershell
-powershell -ExecutionPolicy Bypass -File agent\fix-windows-tailnet.ps1
-powershell -ExecutionPolicy Bypass -File agent\run-dhd-admin.ps1
-```
-
-## 7. SSH keys (one-time — Tim asked agents to connect)
-
-```powershell
-powershell -ExecutionPolicy Bypass -File agent_coordination\ssh\install-on-dhd-admin.ps1
-```
-
-This adds Cursor’s Mac key to your `authorized_keys`, ensures `sshd` runs, and generates a Codex key (commit `keys/codex-dhd-admin.pub` after).
-
-See `agent_coordination/ssh/README.md`.
+See `agent_coordination/PROTOCOL.md`, `ssh/README.md`, and `agent/README.md` (Tailnet recovery).
 
 ## Ping Cursor (optional)
 
 ```powershell
-node agent_coordination/ping-agent.mjs "Codex online, ack protocol v2"
+node agent_coordination/ping-agent.mjs "Codex bootstrap done"
 ```

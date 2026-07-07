@@ -20,6 +20,7 @@ Multi-agent coordination for TIM — Cursor (Mac), Codex (DHD-Admin), and future
 npm run coord:check-in -- --agent cursor   # or codex
 node agent_coordination/query-node.mjs dhd-admin
 node agent_coordination/ping-agent.mjs "message"
+npm run coord:verify                       # full stack check (Mac)
 ```
 
 ## Update rules
