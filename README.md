@@ -26,7 +26,7 @@ Mac commits; Windows pulls. **Do not** rely on Dropbox for code sync. See [docs/
 
 ## Multi-agent coordination
 
-**Start here:** [agent_coordination/](agent_coordination/) — `STATE.json`, roles, and locks for Cursor + Codex.
+**Start here:** [agent_coordination/](agent_coordination/) — **`PROTOCOL.md`**, `STATE.json`, `INBOX.md`, `npm run coord:check-in`
 
 ## Architecture
 

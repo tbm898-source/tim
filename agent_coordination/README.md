@@ -6,16 +6,20 @@ Multi-agent coordination for TIM — Cursor (Mac), Codex (DHD-Admin), and future
 
 ## Read order
 
-1. `STATE.json` — who owns what right now
-2. `INBOX.md` — async messages between agents
-3. `ROLES.md` — lanes and boundaries
-4. `docs/DUAL_MACHINE_WORKFLOW.md` — git-not-Dropbox rules
+1. `PROTOCOL.md` — **how Cursor and Codex work together**
+2. `STATE.json` — who owns what right now
+3. `INBOX.md` — async messages between agents
+4. `LANES.json` — path ownership
+5. `ROLES.md` — summary table
+6. `CODEX_START.md` — DHD-Admin checklist (Codex only)
+7. `docs/DUAL_MACHINE_WORKFLOW.md` — git-not-Dropbox rules
 
 ## Tools (Mac or DHD-Admin, after `git pull`)
 
 ```bash
-node agent_coordination/query-node.mjs dhd-admin   # node status + pending commands
-node agent_coordination/ping-agent.mjs "message"   # post DeviceEvent + metadata ping
+npm run coord:check-in -- --agent cursor   # or codex
+node agent_coordination/query-node.mjs dhd-admin
+node agent_coordination/ping-agent.mjs "message"
 ```
 
 ## Update rules

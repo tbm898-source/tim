@@ -1,25 +1,40 @@
 # Agent roles
 
+> Full rules: [`PROTOCOL.md`](PROTOCOL.md) · Path map: [`LANES.json`](LANES.json)
+
 | Agent | Host | Primary lane |
 |-------|------|----------------|
-| **Cursor** | Mac (`macbook-air`) | Frontend, Base44 functions, git push to `main`, PR review |
-| **Codex** | DHD-Admin (Windows) | Edge agent, Tailnet recovery, Windows testing, `agent:run` |
+| **Cursor** | Mac (`macbook-air`) | `src/**`, `base44/**`, `docs/**`, CI, git push |
+| **Codex** | DHD-Admin (Windows) | `agent/**`, Tailnet, `agent:run`, Windows testing |
 | **Human** | Either | Merge approval, Base44 deploy, secrets |
+
+## Every session
+
+```bash
+git pull origin main
+npm run coord:check-in -- --agent <cursor|codex>
+```
+
+| Status | Meaning |
+|--------|---------|
+| `GO` | In lane — update STATE before editing locked paths |
+| `PULL` | Behind main — pull first |
+| `WAIT` | Other agent holds locks — read INBOX.md |
 
 ## Do not collide
 
-- One agent per `STATE.json` lock path prefix.
-- Pull `origin main` before starting work.
-- Never edit the same files on Mac and Windows at the same time (Dropbox conflict copies).
+- One `holder` in `STATE.json` for overlapping locks.
+- Never edit Mac + Windows checkouts at the same time.
+- Hand off in `INBOX.md` when changing lanes.
 
-## Handoff format
+## Handoff
 
-When finishing a lane, update `STATE.json`:
+When finishing, clear STATE and append INBOX:
 
 ```json
 {
-  "active_task": null,
   "holder": null,
-  "note": "Ready for Cursor: <what to do next>"
+  "active_task": null,
+  "locks": []
 }
 ```
