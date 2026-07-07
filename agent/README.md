@@ -1,5 +1,7 @@
 # TIM edge agent
 
+> **Multi-agent:** check [`agent_coordination/`](../agent_coordination/) (`STATE.json`) before editing agent files.
+
 The edge agent is the trusted local executor for TIM. It runs on a Windows PC, Mac, or Linux host, polls the Base44 command ledger, validates every command against a local allowlist, and publishes the result.
 
 It does **not** provide an arbitrary remote shell.

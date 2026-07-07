@@ -24,6 +24,10 @@ powershell -ExecutionPolicy Bypass -File agent\run-dhd-admin.ps1
 
 Mac commits; Windows pulls. **Do not** rely on Dropbox for code sync. See [docs/DUAL_MACHINE_WORKFLOW.md](docs/DUAL_MACHINE_WORKFLOW.md).
 
+## Multi-agent coordination
+
+**Start here:** [agent_coordination/](agent_coordination/) — `STATE.json`, roles, and locks for Cursor + Codex.
+
 ## Architecture
 
 - Frontend: React + Vite in `src/`
