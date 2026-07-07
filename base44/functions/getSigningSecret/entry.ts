@@ -4,7 +4,7 @@
  * NOTE: Rotation only updates the in-memory response; to truly rotate the secret
  * the admin must paste the new value into Base44 Settings → Secrets.
  */
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.35';
 
 Deno.serve(async (req) => {
   try {

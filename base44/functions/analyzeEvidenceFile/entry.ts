@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.35';
 
 const EVIDENCE_ANALYSIS_PROMPT = `You are an evidence analysis system. Output JSON only.
 

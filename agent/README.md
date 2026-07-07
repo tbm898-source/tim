@@ -10,6 +10,14 @@ It does **not** provide an arbitrary remote shell.
 npm run agent:capabilities
 ```
 
+## Health check (before `agent:run`)
+
+```powershell
+npm run agent:health
+```
+
+Reports signing secret presence, Base44 bridge reachability, and whether this node is registered. Exit code 0 = ready to run.
+
 ## Configure Windows and Android
 
 Set values in the host environment or in a local `.env` mechanism managed outside this repository. Never commit the signing secret.

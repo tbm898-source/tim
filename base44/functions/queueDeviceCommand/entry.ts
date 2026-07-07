@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.35';
 
 const ACTION_POLICIES = {
   'system.inventory': { risk: 'read_only', capability: 'system.inventory' },
