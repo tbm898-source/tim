@@ -32,3 +32,4 @@ dist-ssr
 *conflicted copy*
 
 .env
+base44/.app.jsonc
