@@ -1,11 +1,28 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Bot, MonitorSmartphone, Wrench, ShieldCheck, Settings, BarChart3, Users } from 'lucide-react';
+import {
+  Bot,
+  MonitorSmartphone,
+  Wrench,
+  ShieldCheck,
+  Settings,
+  BarChart3,
+  Users,
+  GraduationCap,
+  BookOpen,
+  MessageSquare,
+  Megaphone,
+  FileEdit,
+} from 'lucide-react';
 import { DESKTOP_NAV_ITEMS } from '@/nav.config';
 
 const ICONS = {
   SETH: Bot,
+  ClassroomPublisher: Megaphone,
+  ClassroomDraftHelper: FileEdit,
+  CourseGenerator: BookOpen,
+  InstructorFeedbackAssistant: MessageSquare,
   Devices: MonitorSmartphone,
   Dashboard: BarChart3,
   AssetManagement: Wrench,
@@ -34,7 +51,7 @@ export default function TopNav() {
           <span className="text-lg font-bold text-cyan-300 tracking-wider">TIM</span>
         </Link>
         {DESKTOP_NAV_ITEMS.map((item) => {
-          const Icon = ICONS[item.page];
+          const Icon = ICONS[item.page] || GraduationCap;
           const path = item.path || createPageUrl(item.page);
           const active = isActive(item);
           return (

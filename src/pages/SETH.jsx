@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { InvokeLLM, GenerateImage } from "@/integrations/Core";
-import { Learning } from "@/entities/Learning";
-import { ChatSession } from "@/entities/ChatSession";
+import { InvokeLLM, GenerateImage } from "@/api/integrations";
+import { base44 } from "@/api/base44Client";
+
+const Learning = base44.entities.Learning;
+const ChatSession = base44.entities.ChatSession;
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Settings, Mic, Send, Bot, User, Loader2, History, Image as ImageIcon, Film, MessageCircle, Video, BookOpen, CheckSquare, LayoutDashboard } from "lucide-react";

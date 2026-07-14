@@ -16,7 +16,17 @@
     "agent:test": "node --test agent/tests/*.test.mjs",
     "coord:check-in": "node agent_coordination/check-in.mjs",
     "coord:verify": "node agent_coordination/verify.mjs",
-    "check": "npm run agent:test && npm run build"
+    "check": "npm run agent:test && npm run build",
+    "teach:auth-google": "npm --prefix ../classroom-chatgpt-bridge run auth-google",
+    "teach:setup": "bash scripts/setup-classroom-bridge.sh",
+    "teach:courses": "npm --prefix ../classroom-chatgpt-bridge run courses",
+    "teach:draft": "npm --prefix ../classroom-chatgpt-bridge run draft --",
+    "teach:gate": "npm --prefix ../classroom-chatgpt-bridge run gate --",
+    "teach:post": "npm --prefix ../classroom-chatgpt-bridge run post-announcement --",
+    "teach:serve": "npm --prefix ../classroom-chatgpt-bridge run serve",
+    "teach:start": "bash scripts/teach-start.sh",
+    "teach:wizard": "bash scripts/teach-bridge-wizard.sh",
+    "goliath:health": "bash scripts/goliath-health.sh"
   },
   "dependencies": {
     "@base44/sdk": "^0.8.39",

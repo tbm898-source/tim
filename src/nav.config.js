@@ -11,6 +11,10 @@ export const MOBILE_NAV_ITEMS = [
 
 export const DESKTOP_NAV_ITEMS = [
   { name: 'TIM', page: 'SETH', path: '/', alsoActive: ['/SETH'] },
+  { name: 'Classroom AI', page: 'ClassroomPublisher' },
+  { name: 'Classroom Draft', page: 'ClassroomDraftHelper' },
+  { name: 'Courses', page: 'CourseGenerator' },
+  { name: 'Feedback', page: 'InstructorFeedbackAssistant' },
   { name: 'Devices', page: 'Devices' },
   { name: 'Dashboard', page: 'Dashboard' },
   { name: 'Assets', page: 'AssetManagement' },

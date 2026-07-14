@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  LaunchAgent template — review and replace PLACEHOLDER strings before installing.
+  Do NOT install until manual connected mode is verified.
+  Do NOT embed TIM_COMMAND_SIGNING_SECRET here; the wrapper reads it from Keychain.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.tim.tim-edge</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>PLACEHOLDER_REPO_ROOT/agent/macos/run-tim-edge.sh</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>PLACEHOLDER_REPO_ROOT</string>
+  <key>StandardOutPath</key>
+  <string>/Users/PLACEHOLDER_USERNAME/Library/Logs/TIM/tim-edge.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/PLACEHOLDER_USERNAME/Library/Logs/TIM/tim-edge-error.log</string>
+  <key>KeepAlive</key>
+  <true/>
+  <key>ThrottleInterval</key>
+  <integer>30</integer>
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>
