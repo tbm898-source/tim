@@ -1,0 +1,37 @@
+{
+  "name": "BridgeLog",
+  "type": "object",
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC time of the authenticated bridge request"
+    },
+    "action": {
+      "type": "string",
+      "description": "Allowed bridge operation requested"
+    },
+    "node_id": {
+      "type": "string",
+      "description": "Device node identifier when included in the request"
+    },
+    "success": {
+      "type": "boolean",
+      "description": "Whether the operation completed successfully"
+    },
+    "response_status": {
+      "type": "integer",
+      "description": "HTTP-style outcome status"
+    },
+    "error_message": {
+      "type": "string",
+      "description": "Sanitized error message for failed operations"
+    }
+  },
+  "required": [
+    "timestamp",
+    "action",
+    "success",
+    "response_status"
+  ]
+}

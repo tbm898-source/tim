@@ -21,6 +21,9 @@ export default function IntegrityMonitoring() {
   const [filterType, setFilterType] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [reviewNote, setReviewNote] = useState('');
+  const [actionRationale, setActionRationale] = useState('');
+  const [notificationRecipients, setNotificationRecipients] = useState('');
+  const [actionError, setActionError] = useState('');
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -48,95 +51,64 @@ export default function IntegrityMonitoring() {
   });
 
   const updateAlertMutation = useMutation({
-    mutationFn: ({ id, updates }) => base44.entities.IntegrityAlert.update(id, updates),
+    mutationFn: async ({ functionName, payload }) => {
+      const response = await base44.functions.invoke(functionName, payload);
+      return response.data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['integrityAlerts'] });
       setSelectedAlert(null);
       setReviewNote('');
+      setActionRationale('');
+      setNotificationRecipients('');
+      setActionError('');
     },
+    onError: (error) => setActionError(error.message || 'Unable to complete this action.'),
   });
 
   const handleStatusChange = async (alert, newStatus, reason = '') => {
+    if (newStatus === 'resolved' && ['high', 'critical'].includes(alert.severity) && !reason.trim()) {
+      setActionError('Add a resolution rationale before closing a high or critical alert.');
+      return;
+    }
+    setActionError('');
     const correlationId = generateCorrelationId();
-    const statusHistory = alert.status_history || [];
-    statusHistory.push({
-      timestamp: new Date().toISOString(),
-      from_status: alert.status,
-      to_status: newStatus,
-      changed_by: user.email,
-      reason
-    });
-
-    // Track status change
-    await trackIntegrityAlertStatusChanged(
-      alert,
-      alert.status,
-      newStatus,
-      user.role,
-      reason || 'manual_ui_change',
-      correlationId
-    );
-
+    await trackIntegrityAlertStatusChanged(alert, alert.status, newStatus, user.role, reason || 'manual_ui_change', correlationId);
     updateAlertMutation.mutate({
-      id: alert.id,
-      updates: {
-        status: newStatus,
-        status_history: statusHistory,
-        reviewed_by: user.email
-      }
+      functionName: 'triageIntegrityAlert',
+      payload: { alert_id: alert.id, action: 'status', status: newStatus, rationale: reason },
     });
   };
 
   const handleAddReviewNote = (alert) => {
     if (!reviewNote.trim()) return;
+    const reviewNotes = [...(alert.review_notes || []), {
+      timestamp: new Date().toISOString(), reviewer: user.email, note: reviewNote,
+    }];
+    base44.entities.IntegrityAlert.update(alert.id, { review_notes: reviewNotes, reviewed_by: user.email })
+      .then(() => queryClient.invalidateQueries({ queryKey: ['integrityAlerts'] }));
+    setReviewNote('');
+  };
 
-    const reviewNotes = alert.review_notes || [];
-    reviewNotes.push({
-      timestamp: new Date().toISOString(),
-      reviewer: user.email,
-      note: reviewNote
-    });
-
+  const handleEscalate = async (alert) => {
+    if (!actionRationale.trim()) {
+      setActionError('Add an escalation rationale before escalating this alert.');
+      return;
+    }
+    setActionError('');
+    const notifiedParties = notificationRecipients.split(',').map((email) => email.trim()).filter(Boolean);
+    const currentLevel = alert.escalation_level || 0;
+    const nextLevel = Math.min(currentLevel + 1, 4);
+    await trackIntegrityAlertEscalated(alert, currentLevel, nextLevel, 'manual_escalation', notifiedParties.length, generateCorrelationId());
     updateAlertMutation.mutate({
-      id: alert.id,
-      updates: {
-        review_notes: reviewNotes,
-        reviewed_by: user.email
-      }
+      functionName: 'triageIntegrityAlert',
+      payload: { alert_id: alert.id, action: 'escalate', rationale: actionRationale, notified_parties: notifiedParties },
     });
   };
 
-  const handleEscalate = async (alert, level, notifiedParties) => {
-    const correlationId = generateCorrelationId();
-    const currentLevel = alert.escalation_level || 0;
-    const nextLevel = Math.min(currentLevel + 1, 4);
-    
-    const escalationPath = alert.escalation_path || [];
-    escalationPath.push({
-      level: nextLevel,
-      timestamp: new Date().toISOString(),
-      notified_parties: notifiedParties
-    });
-
-    // Track escalation
-    await trackIntegrityAlertEscalated(
-      alert,
-      currentLevel,
-      nextLevel,
-      `escalated_to_${level}`,
-      notifiedParties.length,
-      correlationId
-    );
-
-    handleStatusChange(alert, 'escalated', `Escalated to ${level}`);
-    
-    updateAlertMutation.mutate({
-      id: alert.id,
-      updates: {
-        escalation_level: nextLevel,
-        escalation_path: escalationPath
-      }
-    });
+  const handleSealEvidence = (alert) => {
+    setActionError('');
+    updateAlertMutation.mutate({ functionName: 'sealEvidencePackage', payload: { alert_id: alert.id } });
   };
 
   const filteredAlerts = alerts.filter(alert => {
@@ -182,12 +154,18 @@ export default function IntegrityMonitoring() {
     return icons[status] || icons.new;
   };
 
+  const reviewedAlerts = alerts.filter((alert) => alert.status_history?.length && alert.detection_timestamp);
+  const averageReviewHours = reviewedAlerts.length
+    ? Math.round(reviewedAlerts.reduce((total, alert) => total + ((new Date(alert.status_history[0].timestamp) - new Date(alert.detection_timestamp)) / 3600000), 0) / reviewedAlerts.length)
+    : 0;
   const stats = {
     total: alerts.length,
     new: alerts.filter(a => a.status === 'new').length,
     underReview: alerts.filter(a => a.status === 'under_review').length,
     escalated: alerts.filter(a => a.status === 'escalated').length,
-    critical: alerts.filter(a => a.severity === 'critical').length
+    critical: alerts.filter(a => a.severity === 'critical').length,
+    averageReviewHours,
+    escalationRate: alerts.length ? Math.round((alerts.filter((alert) => alert.status === 'escalated').length / alerts.length) * 100) : 0,
   };
 
   if (isLoading || !user) {
@@ -234,7 +212,7 @@ export default function IntegrityMonitoring() {
         </Card>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-7 gap-4 mb-6">
           <Card className="bg-slate-800/50 border-slate-700">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -291,6 +269,28 @@ export default function IntegrityMonitoring() {
                   <p className="text-2xl font-bold text-red-400">{stats.critical}</p>
                 </div>
                 <TrendingUp className="w-8 h-8 text-red-400" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-400 text-sm">Avg. First Review</p>
+                  <p className="text-2xl font-bold text-white">{stats.averageReviewHours}h</p>
+                </div>
+                <Clock className="w-8 h-8 text-slate-400" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-400 text-sm">Escalation Rate</p>
+                  <p className="text-2xl font-bold text-orange-400">{stats.escalationRate}%</p>
+                </div>
+                <TrendingUp className="w-8 h-8 text-orange-400" />
               </div>
             </CardContent>
           </Card>
@@ -492,19 +492,40 @@ export default function IntegrityMonitoring() {
                     </div>
                   )}
 
-                  <div className="flex gap-2 pt-4">
-                    <Button onClick={() => handleStatusChange(selectedAlert, 'under_review')} className="bg-yellow-600 hover:bg-yellow-700">
-                      Mark Under Review
-                    </Button>
-                    <Button onClick={() => handleStatusChange(selectedAlert, 'resolved')} className="bg-green-600 hover:bg-green-700">
-                      Mark Resolved
-                    </Button>
-                    <Button onClick={() => handleStatusChange(selectedAlert, 'false_positive')} variant="outline" className="border-slate-600">
-                      Mark False Positive
-                    </Button>
-                    <Button onClick={() => handleEscalate(selectedAlert, 'external_forensic', [])} className="bg-red-600 hover:bg-red-700">
-                      Escalate to External Team
-                    </Button>
+                  <div className="space-y-3 pt-4">
+                    <Textarea
+                      value={actionRationale}
+                      onChange={(e) => setActionRationale(e.target.value)}
+                      placeholder="Decision or escalation rationale (required for high/critical resolution and escalation)"
+                      className="bg-slate-900 border-slate-600 text-white"
+                      rows={3}
+                    />
+                    <Input
+                      value={notificationRecipients}
+                      onChange={(e) => setNotificationRecipients(e.target.value)}
+                      placeholder="Escalation email recipients, separated by commas"
+                      className="bg-slate-900 border-slate-600 text-white"
+                    />
+                    {actionError && <p className="text-sm text-red-400">{actionError}</p>}
+                    <div className="flex flex-wrap gap-2">
+                      <Button onClick={() => handleStatusChange(selectedAlert, 'under_review', actionRationale)} className="bg-yellow-600 hover:bg-yellow-700">
+                        Mark Under Review
+                      </Button>
+                      <Button onClick={() => handleStatusChange(selectedAlert, 'resolved', actionRationale)} className="bg-green-600 hover:bg-green-700">
+                        Mark Resolved
+                      </Button>
+                      <Button onClick={() => handleStatusChange(selectedAlert, 'false_positive', actionRationale)} variant="outline" className="border-slate-600">
+                        Mark False Positive
+                      </Button>
+                      <Button onClick={() => handleEscalate(selectedAlert)} className="bg-red-600 hover:bg-red-700">
+                        Escalate to External Team
+                      </Button>
+                      {selectedAlert.status === 'resolved' && !selectedAlert.evidence_hash && (
+                        <Button onClick={() => handleSealEvidence(selectedAlert)} variant="outline" className="border-cyan-500 text-cyan-300">
+                          Seal Evidence Package
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </TabsContent>
 
