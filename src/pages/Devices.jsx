@@ -20,6 +20,7 @@ import { appParams } from '@/lib/app-params';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import BridgeActivityLog from '@/components/devices/BridgeActivityLog';
 
 const STATUS_CLASSES = {
   online: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200',
@@ -77,6 +78,7 @@ function EmptyState({ previewMode }) {
 export default function Devices() {
   const [nodes, setNodes] = useState([]);
   const [commands, setCommands] = useState([]);
+  const [bridgeLogs, setBridgeLogs] = useState([]);
   const [loading, setLoading] = useState(!appParams.isPreviewMode);
   const [workingId, setWorkingId] = useState('');
   const [error, setError] = useState('');
@@ -86,12 +88,14 @@ export default function Devices() {
     setLoading(true);
     setError('');
     try {
-      const [nodeRows, commandRows] = await Promise.all([
+      const [nodeRows, commandRows, logRows] = await Promise.all([
         base44.entities.DeviceNode.list('-last_seen', 50),
         base44.entities.DeviceCommand.list('-created_date', 30),
+        base44.entities.BridgeLog.list('-timestamp', 15),
       ]);
       setNodes(nodeRows);
       setCommands(commandRows);
+      setBridgeLogs(logRows);
     } catch (loadError) {
       setError(loadError.message || 'Device control data is unavailable.');
     } finally {
@@ -265,9 +269,11 @@ export default function Devices() {
               </CardContent>
             </Card>
           </section>
-        </div>
+          </div>
 
-        <section className="mt-8 grid gap-4 md:grid-cols-3">
+          <BridgeActivityLog logs={bridgeLogs} formatTimestamp={formatTimestamp} />
+
+          <section className="mt-8 grid gap-4 md:grid-cols-3">
           <Card className="border-white/10 bg-slate-900/60">
             <CardHeader><CardTitle className="text-base text-white">Windows + Android</CardTitle><CardDescription className="text-slate-400">Android Studio, Gradle, ADB inventory, and approved APK installs through the Windows agent.</CardDescription></CardHeader>
           </Card>
