@@ -52,6 +52,8 @@ import Achievements from './pages/Achievements';
 import AssetManagement from './pages/AssetManagement';
 import AssetScanner from './pages/AssetScanner';
 import CourseGenerator from './pages/CourseGenerator';
+import ClassroomPublisher from './pages/ClassroomPublisher';
+import ClassroomDraftHelper from './pages/ClassroomDraftHelper';
 import Dashboard from './pages/Dashboard';
 import InstructorAnalytics from './pages/InstructorAnalytics';
 import InstructorFeedbackAssistant from './pages/InstructorFeedbackAssistant';
@@ -82,6 +84,8 @@ export const PAGES = {
     "AssetManagement": AssetManagement,
     "AssetScanner": AssetScanner,
     "CourseGenerator": CourseGenerator,
+    "ClassroomPublisher": ClassroomPublisher,
+    "ClassroomDraftHelper": ClassroomDraftHelper,
     "Dashboard": Dashboard,
     "InstructorAnalytics": InstructorAnalytics,
     "InstructorFeedbackAssistant": InstructorFeedbackAssistant,

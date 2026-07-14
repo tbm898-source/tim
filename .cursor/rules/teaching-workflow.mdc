@@ -1,0 +1,78 @@
+---
+description: Teaching workflow — SETH, instructor tools, ChatGPT bridge, AYA gating
+globs: src/pages/SETH.jsx,src/pages/CourseGenerator.jsx,src/pages/AIContentGenerator.jsx,src/pages/InstructorFeedbackAssistant.jsx,src/pages/StudyAssistant.jsx,src/pages/ClassroomDraftHelper.jsx,src/components/seth/**
+alwaysApply: false
+---
+
+# Teaching workflow (Tim)
+
+Tim's priority: **teaching runs smoothly**. Pure Canonical Core stays a separate repo.
+
+## Three AI lanes (use the right one)
+
+| Lane | When | Where |
+|------|------|--------|
+| **TIM / SETH** | Students in class; in-app chat, quizzes, study mode | `/SETH`, `/StudyAssistant` — Base44 `InvokeLLM` |
+| **Classroom bridge** | Draft announcements, list courses, post to Google Classroom with AYA gate | `npm run teach:*` → `classroom-chatgpt-bridge` |
+| **ChatGPT (Cursor extension)** | Lesson planning, rubrics, email drafts, Classroom announcements — you review before publish | OpenAI ChatGPT sidebar in Cursor; use `/ClassroomDraftHelper` for structured prompts, or paste into TIM |
+
+Do not merge Classroom bridge secrets into TIM frontend. API keys live in `classroom-chatgpt-bridge/.env` only.
+
+## Instructor pages (TIM)
+
+| Page | Route | Workflow |
+|------|-------|----------|
+| **Classroom Draft** | `/ClassroomDraftHelper` | Structured fields → copy ChatGPT prompt → paste → AYA → post or copy |
+| **Classroom AI** | `/ClassroomPublisher` | Freeform prompt → TIM `InvokeLLM` draft → AYA → post or copy command |
+
+Also: `/SETH`, `/CourseGenerator`, `/AIContentGenerator`, `/InstructorFeedbackAssistant`, `/InstructorGrading`, `/LearningPathwayGenerator`, `/StudentProgressTracker`.
+
+AI in TIM uses `@/api/integrations` → `InvokeLLM`. No direct OpenAI SDK in this repo.
+
+## Classroom bridge (from TIM repo root)
+
+Setup once in `CANONICAL/30_CODE/classroom-chatgpt-bridge`: copy `.env.example` → `.env`, set `OPENAI_API_KEY`, run `npm run teach:auth-google`.
+
+**Before class:** If you ran the wizard once, the bridge starts at login automatically.
+
+**One-time wizard (recommended on Mac):**
+
+```bash
+npm run teach:wizard
+```
+
+Walks through Google OAuth (if needed), installs a LaunchAgent, and verifies the bridge. After that, one-click post works whenever you're logged in.
+
+**Manual session start (no LaunchAgent):**
+
+```bash
+npm run teach:start
+```
+
+**Wizard maintenance:**
+
+```bash
+npm run teach:wizard -- status
+npm run teach:wizard -- uninstall
+npm run teach:wizard -- restart
+```
+
+**CLI fallback:**
+
+```bash
+npm run teach:courses
+npm run teach:draft -- "Weekly lab reminder for solar construction"
+npm run teach:gate -- --text "Your draft here"
+npm run teach:post -- --courseId ID --text "..." --dry-run
+```
+
+All Classroom posts must pass AYA policy (`config/aya-policy.json` in bridge repo). Server re-runs AYA on every post.
+
+**Deployed TIM caveat:** Browsers may prompt for Private Network Access when a public HTTPS site calls localhost. Local dev (`npm run dev`) is fully reliable.
+
+## Agent behavior
+
+- Treat teaching UX bugs and broken LMS flows as **P0** during class.
+- Prefer minimal diffs on SETH and instructor pages.
+- When drafting content for Tim, match AYA-appropriate tone: clear, inclusive, secondary/college level unless specified.
+- Route Program OS / curriculum spine work to `canonical-program-os`, not TIM.

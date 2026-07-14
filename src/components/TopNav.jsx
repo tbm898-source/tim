@@ -1,9 +1,14 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Bot, MonitorSmartphone, Wrench, ShieldCheck, Settings, BarChart3, Users } from 'lucide-react';
+import { Bot, MonitorSmartphone, Wrench, ShieldCheck, Settings, BarChart3, Users, GraduationCap, BookOpen, MessageSquare, Megaphone, FileEdit } from 'lucide-react';
 
 const navItems = [
   { name: 'TIM', path: '/', icon: Bot },
+  { name: 'SETH', path: '/SETH', icon: GraduationCap },
+  { name: 'Classroom AI', path: '/ClassroomPublisher', icon: Megaphone },
+  { name: 'Classroom Draft', path: '/ClassroomDraftHelper', icon: FileEdit },
+  { name: 'Courses', path: '/CourseGenerator', icon: BookOpen },
+  { name: 'Feedback', path: '/InstructorFeedbackAssistant', icon: MessageSquare },
   { name: 'Devices', path: '/Devices', icon: MonitorSmartphone },
   { name: 'Dashboard', path: '/Dashboard', icon: BarChart3 },
   { name: 'Assets', path: '/AssetManagement', icon: Wrench },
@@ -16,7 +21,8 @@ export default function TopNav() {
   const location = useLocation();
 
   const isActive = (path) => {
-    if (path === '/') return location.pathname === '/' || location.pathname === '/SETH';
+    if (path === '/') return location.pathname === '/';
+    if (path === '/SETH') return location.pathname === '/SETH' || location.pathname === '/';
     return location.pathname === path;
   };
 

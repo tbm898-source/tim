@@ -43,17 +43,43 @@ Before using ADB, enable developer options and USB debugging on the Android devi
 
 ## Configure macOS, Xcode, and Apple Shortcuts
 
+### One-time setup
+
 ```bash
-export TIM_NODE_ID='tim-primary-mac'
-export TIM_NODE_NAME='Primary Mac'
-export TIM_TRUST_LEVEL='assist'
-export TIM_ALLOWED_WORKSPACES="$HOME/Developer:$HOME/Projects"
-export TIM_ALLOWED_SHORTCUTS='Good Night,Start Work'
-export TIM_COMMAND_SIGNING_SECRET='<same-long-random-secret-configured-in-base44>'
-npm run agent:run
+bash agent/setup-mac.sh
 ```
 
-Install Xcode and its command-line tools first. Only Shortcuts named in `TIM_ALLOWED_SHORTCUTS` can run.
+The script prompts for:
+
+1. **Base44 server URL** — e.g. `https://base44.app` or your custom domain like `https://oneosiris.com`. Do **not** enter the full bridge path; the agent appends `/api/apps/<appId>/functions/deviceAgentBridge` automatically.
+2. **Signing secret** — hidden input, stored in macOS Keychain only (service: `TIM Edge Agent`)
+3. **Workspace allowlist** — colon-separated paths
+4. **Shortcut allowlist** — comma-separated names, or empty to disable `shortcut.run`
+
+Non-secret settings are written to `~/.config/tim-edge/agent.env` (mode 600). The script does not edit shell profiles.
+
+### Verify and start
+
+```bash
+npm run agent:capabilities   # uses hostname default unless env is loaded
+npm run agent:test
+bash agent/macos/run-tim-edge.sh
+```
+
+The wrapper loads `~/.config/tim-edge/agent.env`, retrieves the secret from Keychain, and starts the agent as `tim-primary-mac`.
+
+### Rollback (macOS)
+
+```bash
+rm ~/.config/tim-edge/agent.env
+security delete-generic-password -a "$USER" -s "TIM Edge Agent"
+```
+
+Stop a running agent with **Ctrl+C**.
+
+### LaunchAgent (later, after manual verification)
+
+See `agent/macos/com.tim.tim-edge.plist.example`. Replace all `PLACEHOLDER` paths before installing. Do not load until connected mode is confirmed working.
 
 ## Local command test
 
