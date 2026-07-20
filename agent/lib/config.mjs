@@ -9,6 +9,9 @@ const splitList = (value, separator = ',') => (value || '')
 export function loadAgentConfig(env = process.env) {
   const allowedWorkspaces = splitList(env.TIM_ALLOWED_WORKSPACES, path.delimiter)
     .map((workspace) => path.resolve(workspace));
+  const pollIntervalMs = Math.max(5_000, Number(env.TIM_POLL_INTERVAL_MS) || 15_000);
+  const heartbeatIntervalMs = Math.max(pollIntervalMs, 15_000, Number(env.TIM_HEARTBEAT_INTERVAL_MS) || 60_000);
+  const maxBackoffMs = Math.max(pollIntervalMs, 30_000, Number(env.TIM_MAX_BACKOFF_MS) || 300_000);
 
   return {
     appId: env.TIM_BASE44_APP_ID || '695cfbf7fba07f58d25ff8bb',
@@ -17,7 +20,9 @@ export function loadAgentConfig(env = process.env) {
     nodeId: env.TIM_NODE_ID || os.hostname().toLowerCase().replace(/[^a-z0-9.-]/g, '-'),
     displayName: env.TIM_NODE_NAME || os.hostname(),
     trustLevel: env.TIM_TRUST_LEVEL || 'observe',
-    pollIntervalMs: Math.max(2_000, Number(env.TIM_POLL_INTERVAL_MS) || 5_000),
+    pollIntervalMs,
+    heartbeatIntervalMs,
+    maxBackoffMs,
     allowedWorkspaces,
     allowedShortcuts: splitList(env.TIM_ALLOWED_SHORTCUTS),
     androidStudioPath: env.TIM_ANDROID_STUDIO_PATH || '',

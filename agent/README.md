@@ -116,6 +116,12 @@ Configure `TIM_COMMAND_SIGNING_SECRET` as a protected Base44 function secret and
 
 The agent uses the HMAC-protected `deviceAgentBridge` function for connected mode, so it does not need a Base44 user access token on the trusted host. Before exposing the control plane beyond a private test environment, replace shared-secret provisioning with one-time pairing and device-scoped, revocable credentials.
 
+### Polling and retry behavior
+
+Connected agents poll for commands every 15 seconds and send a node heartbeat once per minute. Routine successful polls and heartbeats are not written to `BridgeLog`; command mutations and lifecycle events remain auditable. HTTP 429, HTTP 5xx, and network failures trigger exponential backoff with jitter instead of fixed-rate retries. `Retry-After` is honored when the bridge supplies it.
+
+The defaults can be slowed further with `TIM_POLL_INTERVAL_MS`, `TIM_HEARTBEAT_INTERVAL_MS`, and `TIM_MAX_BACKOFF_MS`. Safety floors prevent configuration from restoring the previous high-frequency retry loop.
+
 ## Windows Tailnet / internet recovery
 
 **Symptom:** Windows PCs (`DHD-Admin`, `DESKTOP-HN4P1BS`, etc.) cannot reach the internet for many apps (browser, npm, git, Base44) even though Wi‑Fi looks connected.
