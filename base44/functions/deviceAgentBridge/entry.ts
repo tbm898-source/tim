@@ -10,6 +10,11 @@ const ALLOWED_ACTIONS = new Set([
   'updateDeviceCommand',
   'createDeviceEvent',
 ]);
+const AUDITED_ACTIONS = new Set([
+  'createDeviceNode',
+  'updateDeviceCommand',
+  'createDeviceEvent',
+]);
 
 const timingSafeEqualHex = (left: string, right: string): boolean => {
   if (left.length !== right.length) return false;
@@ -43,6 +48,27 @@ async function recordBridgeLog(base44: ReturnType<typeof createClientFromRequest
     console.error('Bridge log write failed:', error);
   }
 }
+
+const getUpstreamStatus = (error: unknown, fallback: number): number => {
+  if (error instanceof SyntaxError) return 400;
+  const status = Number((error as { response?: { status?: unknown } })?.response?.status);
+  return Number.isInteger(status) && status >= 400 && status <= 599 ? status : fallback;
+};
+
+const getRetryAfter = (error: unknown): string | null => {
+  const headers = (error as { response?: { headers?: unknown } })?.response?.headers;
+  if (!headers || typeof headers !== 'object') return null;
+  const headerBag = headers as { get?: (name: string) => unknown; [key: string]: unknown };
+  const value = typeof headerBag.get === 'function'
+    ? headerBag.get('retry-after')
+    : headerBag['retry-after'];
+  return typeof value === 'string' && value ? value : null;
+};
+
+const jsonError = (message: string, status: number, retryAfter: string | null = null): Response => {
+  const headers = retryAfter ? { 'Retry-After': retryAfter } : undefined;
+  return Response.json({ error: message }, { status, headers });
+};
 
 async function handleAction(base44: ReturnType<typeof createClientFromRequest>, action: string, payload: Record<string, unknown>) {
   switch (action) {
@@ -99,15 +125,21 @@ Deno.serve(async (req) => {
 
     try {
       const data = await handleAction(base44, action, payload as Record<string, unknown>);
-      await recordBridgeLog(base44, action, payload as Record<string, unknown>, true, 200);
+      if (AUDITED_ACTIONS.has(action)) {
+        await recordBridgeLog(base44, action, payload as Record<string, unknown>, true, 200);
+      }
       return Response.json({ data });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Bridge request failed';
-      await recordBridgeLog(base44, action, payload as Record<string, unknown>, false, 400, message);
-      return Response.json({ error: message }, { status: 400 });
+      const status = getUpstreamStatus(error, 400);
+      if (AUDITED_ACTIONS.has(action) && status !== 429) {
+        await recordBridgeLog(base44, action, payload as Record<string, unknown>, false, status, message);
+      }
+      return jsonError(message, status, getRetryAfter(error));
     }
   } catch (error) {
     console.error('deviceAgentBridge error:', error);
-    return Response.json({ error: error instanceof Error ? error.message : 'Bridge request failed' }, { status: 400 });
+    const message = error instanceof Error ? error.message : 'Bridge request failed';
+    return jsonError(message, getUpstreamStatus(error, 500), getRetryAfter(error));
   }
 });
